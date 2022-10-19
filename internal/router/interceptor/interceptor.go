@@ -1,11 +1,11 @@
 package interceptor
 
 import (
+	"go-porter/internal/app/service/admin"
 	"go-porter/internal/pkg/core"
-	"go-porter/internal/proposal"
-	"go-porter/internal/repository/mysql"
-	"go-porter/internal/repository/redis"
-	"go-porter/internal/services/admin"
+	"go-porter/internal/pkg/mysql"
+	"go-porter/internal/pkg/proposal"
+	"go-porter/internal/pkg/redis"
 
 	"go.uber.org/zap"
 )
@@ -15,8 +15,6 @@ var _ Interceptor = (*interceptor)(nil)
 type Interceptor interface {
 	// CheckLogin 验证是否登录
 	CheckLogin(ctx core.Context) (info proposal.SessionUserInfo, err core.BusinessError)
-	// i 为了避免被其他包实现
-	i()
 }
 
 type interceptor struct {

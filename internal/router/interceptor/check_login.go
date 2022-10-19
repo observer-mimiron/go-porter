@@ -7,8 +7,8 @@ import (
 	"go-porter/configs"
 	"go-porter/internal/code"
 	"go-porter/internal/pkg/core"
-	"go-porter/internal/proposal"
-	"go-porter/internal/repository/redis"
+	"go-porter/internal/pkg/proposal"
+	"go-porter/internal/pkg/redis"
 	"go-porter/pkg/errors"
 )
 

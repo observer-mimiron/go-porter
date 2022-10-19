@@ -1,11 +1,11 @@
 package router
 
 import (
-	"go-porter/internal/alert"
-	"go-porter/internal/metrics"
+	"go-porter/internal/pkg/alert"
 	"go-porter/internal/pkg/core"
-	"go-porter/internal/repository/mysql"
-	"go-porter/internal/repository/redis"
+	"go-porter/internal/pkg/metrics"
+	"go-porter/internal/pkg/mysql"
+	"go-porter/internal/pkg/redis"
 	"go-porter/internal/router/interceptor"
 	"go-porter/pkg/errors"
 	"go.uber.org/zap"
@@ -35,15 +35,16 @@ func NewHTTPServer(logger *zap.Logger) (*Server, error) {
 	// 初始化 DB
 	dbRepo, err := mysql.New()
 	if err != nil {
-		logger.Fatal("new db err", zap.Error(err))
+		logger.Error("new db err", zap.Error(err))
 		panic(err)
 	}
 
 	r.db = dbRepo
+	logger.Info("db init success")
 	// 初始化 Cache
 	cacheRepo, err := redis.New()
 	if err != nil {
-		logger.Fatal("new cache err", zap.Error(err))
+		logger.Error("new cache err", zap.Error(err))
 		panic(err)
 	}
 	r.cache = cacheRepo
@@ -60,6 +61,7 @@ func NewHTTPServer(logger *zap.Logger) (*Server, error) {
 	)
 
 	if err != nil {
+		logger.Error("new mux err", zap.Error(err))
 		panic(err)
 	}
 

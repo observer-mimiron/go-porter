@@ -1,6 +1,6 @@
 [hashids]
 length = 12
-secret = "6ab6122836cfef95f8db"
+secret = "6ab6122836cfef15f8db"
 
 [language]
 local = "zh-cn"
@@ -19,19 +19,20 @@ maxidleconn = 60
 maxopenconn = 10
 
 [mysql.read]
-addr = "mysql"
+addr = "127.0.0.1:3306"
 name = "porter"
 pass = "root"
 user = "root"
 
 [mysql.write]
-addr = "mysql"
+addr = "127.0.0.1:3306"
 name = "porter"
 pass = "root"
 user = "root"
 
+
 [redis]
-addr = "redis:6379"
+addr = "127.0.0.1:6379"
 db = "0"
 maxretries = 3
 minidleconns = 5

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"go-porter/configs"
 	"go-porter/internal/code"
-	"go-porter/internal/proposal"
+	"go-porter/internal/pkg/proposal"
 	"go-porter/pkg/color"
 	"go-porter/pkg/env"
 	"go-porter/pkg/errors"
@@ -23,7 +23,6 @@ import (
 	"golang.org/x/time/rate"
 )
 
-// see https://patorjk.com/software/taag/#p=testall&f=Graffiti&t=go-gin-api
 const _UI = `启动成功`
 
 type Option func(*option)

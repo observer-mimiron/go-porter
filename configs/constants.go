@@ -6,9 +6,6 @@ const (
 	// ProjectName 项目名称
 	ProjectName = "porter"
 
-	// ProjectDomain 项目域名
-	ProjectDomain = "http://127.0.0.1"
-
 	// ProjectPort 项目端口
 	ProjectPort = ":9999"
 

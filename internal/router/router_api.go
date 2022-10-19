@@ -1,13 +1,12 @@
 package router
 
 import (
-	"go-porter/internal/api/admin"
+	"go-porter/internal/app/api/admin"
 	"go-porter/internal/pkg/core"
 )
 
 //AliasForRecordMetrics 别名 用于记录 metrics
 //WrapAuthHandler 权限验证
-
 func setApiRouter(r *resource) {
 	// admin
 	adminHandler := admin.New(r.logger, r.db, r.cache)

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"sync"
 
-	"go-porter/internal/proposal"
+	"go-porter/internal/pkg/proposal"
 	"go-porter/pkg/trace"
 
 	"github.com/gin-gonic/gin"
