@@ -2,8 +2,7 @@ package admin
 
 import (
 	"go-porter/internal/app/model"
-	"go-porter/internal/pkg/core"
-	"go-porter/internal/pkg/mysql"
+	"go-porter/pkg/core/pkg/core"
 )
 
 type SearchData struct {
@@ -29,18 +28,18 @@ func (s *service) PageList(ctx core.Context, searchData *SearchData) (listData [
 	offset := (page - 1) * pageSize
 
 	qb := model.NewQueryBuilder()
-	qb.WhereIsDeleted(mysql.EqualPredicate, -1)
+	qb.WhereIsDeleted("=", -1)
 
 	if searchData.Username != "" {
-		qb.WhereUsername(mysql.EqualPredicate, searchData.Username)
+		qb.WhereUsername("=", searchData.Username)
 	}
 
 	if searchData.Nickname != "" {
-		qb.WhereNickname(mysql.EqualPredicate, searchData.Nickname)
+		qb.WhereNickname("=", searchData.Nickname)
 	}
 
 	if searchData.Mobile != "" {
-		qb.WhereMobile(mysql.EqualPredicate, searchData.Mobile)
+		qb.WhereMobile("=", searchData.Mobile)
 	}
 
 	listData, err = qb.

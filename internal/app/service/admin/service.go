@@ -2,9 +2,9 @@ package admin
 
 import (
 	"go-porter/internal/app/model"
-	"go-porter/internal/pkg/core"
-	"go-porter/internal/pkg/mysql"
-	"go-porter/internal/pkg/redis"
+	"go-porter/pkg/core/pkg/cache/redis"
+	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/database/mysql"
 )
 
 var _ Service = (*service)(nil)

@@ -3,7 +3,7 @@ package model
 import (
 	"fmt"
 	"github.com/pkg/errors"
-	"go-porter/internal/pkg/mysql"
+	"go-porter/pkg/core/pkg/database/mysql"
 	"gorm.io/gorm"
 	"time"
 )

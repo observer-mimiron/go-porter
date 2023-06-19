@@ -2,32 +2,30 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"flag"
+	"go-porter/configs"
+	"go-porter/pkg/core/pkg/conf"
 	"net/http"
 	"time"
 
-	"go-porter/configs"
 	"go-porter/internal/router"
-	"go-porter/pkg/env"
-	"go-porter/pkg/logger"
-	"go-porter/pkg/shutdown"
-	"go-porter/pkg/timeutil"
-
+	"go-porter/pkg/core/pkg/logger"
+	"go-porter/pkg/core/pkg/shutdown"
 	"go.uber.org/zap"
 )
 
+var configFile = flag.String("f", "/configs/config.toml", "the config file")
+
 func main() {
+	flag.Parse()
+
+	conf.Init(configFile)
+	c := conf.Get()
 	// 初始化 access logger
-	accessLogger, err := logger.NewJSONLogger(
-		//logger.WithDisableConsole(),
-		logger.WithField("domain", fmt.Sprintf("%s[%s]", configs.ProjectName, env.Active().Value())),
-		logger.WithTimeLayout(timeutil.CSTLayout),
-		logger.WithFileP(configs.ProjectAccessLogFile),
-	)
+	accessLogger, err := logger.NewJSONLogger(c.Log)
 	if err != nil {
 		panic(err)
 	}
-
 	defer func() {
 		_ = accessLogger.Sync()
 	}()

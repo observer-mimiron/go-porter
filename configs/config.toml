@@ -1,0 +1,45 @@
+Name = "porter"
+Host = "0.0.0.0"
+Port = 8080
+
+[hashids]
+length = 12
+secret = "6ab6122836cfef95f8db"
+
+[log]
+Model = "console"
+Level = "debug"
+Filename = "logs/porter.log"
+MaxSize = 128
+MaxAge = 3
+MaxBackups = 300
+TimeFormat = "2006-01-02T15:04:05.000Z07:00"
+LocalTime = true
+Compress = true
+
+
+[mysql]
+[mysql.base]
+connmaxlifetime = 60
+maxidleconn = 60
+maxopenconn = 10
+
+
+[mysql.write]
+addr = "127.0.0.1:3306"
+name = "porter"
+pass = "root"
+user = "root"
+
+[mysql.read]
+addr = "127.0.0.1:3306"
+name = "porter"
+pass = "root"
+user = "root"
+[redis]
+addr = "127.0.0.1:6379"
+db = "0"
+maxretries = 3
+minidleconns = 5
+pass = ""
+poolsize = 10

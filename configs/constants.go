@@ -9,9 +9,6 @@ const (
 	// ProjectPort 项目端口
 	ProjectPort = ":9999"
 
-	// ProjectAccessLogFile 项目访问日志存放文件
-	ProjectAccessLogFile = "./logs/" + ProjectName + "-access.log"
-
 	// HeaderLoginToken 登录验证 Token，Header 中传递的参数
 	HeaderLoginToken = "Token"
 
@@ -29,9 +26,6 @@ const (
 
 	// RedisKeyPrefixSignature Redis Key 前缀 - 签名验证信息
 	RedisKeyPrefixSignature = ProjectName + ":signature:"
-
-	// ZhCN 简体中文 - 中国
-	ZhCN = "zh-cn"
 
 	// MaxRequestsPerSecond 每秒最大请求量
 	MaxRequestsPerSecond = 10000

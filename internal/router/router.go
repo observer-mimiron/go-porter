@@ -1,13 +1,12 @@
 package router
 
 import (
-	"go-porter/internal/pkg/alert"
-	"go-porter/internal/pkg/core"
-	"go-porter/internal/pkg/metrics"
-	"go-porter/internal/pkg/mysql"
-	"go-porter/internal/pkg/redis"
 	"go-porter/internal/router/interceptor"
-	"go-porter/pkg/errors"
+	"go-porter/pkg/core/pkg/cache/redis"
+	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/database/mysql"
+	"go-porter/pkg/core/pkg/errors"
+	"go-porter/pkg/core/pkg/metrics"
 	"go.uber.org/zap"
 )
 
@@ -54,9 +53,9 @@ func NewHTTPServer(logger *zap.Logger) (*Server, error) {
 		core.WithDisablePrometheus(), // 关闭 prometheus
 		core.WithDisablePProf(),      // 关闭 WithDisablePProf
 
-		core.WithEnableCors(),                                 //跨域
-		core.WithEnableRate(),                                 //限流
-		core.WithAlertNotify(alert.NotifyHandler(logger)),     //报警
+		core.WithEnableCors(), //跨域
+		core.WithEnableRate(), //限流
+		//core.WithAlertNotify(alert.NotifyHandler(logger)),     //报警
 		core.WithRecordMetrics(metrics.RecordHandler(logger)), //监控
 	)
 

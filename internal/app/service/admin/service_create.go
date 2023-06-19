@@ -2,8 +2,8 @@ package admin
 
 import (
 	"go-porter/internal/app/model"
-	"go-porter/internal/pkg/core"
 	"go-porter/internal/pkg/password"
+	"go-porter/pkg/core/pkg/core"
 )
 
 type CreateAdminData struct {

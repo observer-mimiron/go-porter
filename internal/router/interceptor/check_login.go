@@ -2,14 +2,14 @@ package interceptor
 
 import (
 	"encoding/json"
+	"go-porter/configs"
 	"net/http"
 
-	"go-porter/configs"
 	"go-porter/internal/code"
-	"go-porter/internal/pkg/core"
-	"go-porter/internal/pkg/proposal"
-	"go-porter/internal/pkg/redis"
-	"go-porter/pkg/errors"
+	"go-porter/pkg/core/pkg/cache/redis"
+	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/errors"
+	"go-porter/pkg/core/pkg/proposal"
 )
 
 func (i *interceptor) CheckLogin(ctx core.Context) (sessionUserInfo proposal.SessionUserInfo, err core.BusinessError) {

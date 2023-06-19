@@ -2,8 +2,7 @@ package admin
 
 import (
 	"go-porter/internal/app/model"
-	"go-porter/internal/pkg/core"
-	"go-porter/internal/pkg/mysql"
+	"go-porter/pkg/core/pkg/core"
 )
 
 type ModifyData struct {
@@ -19,7 +18,7 @@ func (s *service) ModifyPersonalInfo(ctx core.Context, id int32, modifyData *Mod
 	}
 
 	qb := model.NewQueryBuilder()
-	qb.WhereId(mysql.EqualPredicate, id)
+	qb.WhereId("=", id)
 	err = qb.Updates(s.db.GetDbW().WithContext(ctx.RequestContext()), data)
 	if err != nil {
 		return err

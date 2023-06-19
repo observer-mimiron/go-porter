@@ -3,8 +3,6 @@ package validation
 import (
 	"fmt"
 
-	"go-porter/configs"
-
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/locales/zh"
 	ut "github.com/go-playground/universal-translator"
@@ -15,14 +13,11 @@ import (
 var trans ut.Translator
 
 func init() {
-	lang := configs.Get().Language.Local
-
-	if lang == configs.ZhCN {
-		trans, _ = ut.New(zh.New()).GetTranslator("zh")
-		if err := zhTranslation.RegisterDefaultTranslations(binding.Validator.Engine().(*validator.Validate), trans); err != nil {
-			fmt.Println("validator zh translation error", err)
-		}
+	trans, _ = ut.New(zh.New()).GetTranslator("zh")
+	if err := zhTranslation.RegisterDefaultTranslations(binding.Validator.Engine().(*validator.Validate), trans); err != nil {
+		fmt.Println("validator zh translation error", err)
 	}
+
 }
 
 func Error(err error) (message string) {

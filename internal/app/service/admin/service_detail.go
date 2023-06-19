@@ -2,8 +2,7 @@ package admin
 
 import (
 	"go-porter/internal/app/model"
-	"go-porter/internal/pkg/core"
-	"go-porter/internal/pkg/mysql"
+	"go-porter/pkg/core/pkg/core"
 )
 
 type SearchOneData struct {
@@ -18,30 +17,30 @@ type SearchOneData struct {
 func (s *service) Detail(ctx core.Context, searchOneData *SearchOneData) (info *model.Admin, err error) {
 
 	qb := model.NewQueryBuilder()
-	qb.WhereIsDeleted(mysql.EqualPredicate, -1)
+	qb.WhereIsDeleted("=", -1)
 
 	if searchOneData.Id != 0 {
-		qb.WhereId(mysql.EqualPredicate, searchOneData.Id)
+		qb.WhereId("=", searchOneData.Id)
 	}
 
 	if searchOneData.Username != "" {
-		qb.WhereUsername(mysql.EqualPredicate, searchOneData.Username)
+		qb.WhereUsername("=", searchOneData.Username)
 	}
 
 	if searchOneData.Nickname != "" {
-		qb.WhereNickname(mysql.EqualPredicate, searchOneData.Nickname)
+		qb.WhereNickname("=", searchOneData.Nickname)
 	}
 
 	if searchOneData.Mobile != "" {
-		qb.WhereMobile(mysql.EqualPredicate, searchOneData.Mobile)
+		qb.WhereMobile("=", searchOneData.Mobile)
 	}
 
 	if searchOneData.Password != "" {
-		qb.WherePassword(mysql.EqualPredicate, searchOneData.Password)
+		qb.WherePassword("=", searchOneData.Password)
 	}
 
 	if searchOneData.IsUsed != 0 {
-		qb.WhereIsUsed(mysql.EqualPredicate, searchOneData.IsUsed)
+		qb.WhereIsUsed("=", searchOneData.IsUsed)
 	}
 
 	info, err = qb.QueryOne(s.db.GetDbR().WithContext(ctx.RequestContext()))

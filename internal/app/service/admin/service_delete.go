@@ -3,10 +3,9 @@ package admin
 import (
 	"go-porter/configs"
 	"go-porter/internal/app/model"
-	"go-porter/internal/pkg/core"
-	"go-porter/internal/pkg/mysql"
 	"go-porter/internal/pkg/password"
-	"go-porter/internal/pkg/redis"
+	"go-porter/pkg/core/pkg/cache/redis"
+	"go-porter/pkg/core/pkg/core"
 )
 
 func (s *service) Delete(ctx core.Context, id int32) (err error) {
@@ -16,7 +15,7 @@ func (s *service) Delete(ctx core.Context, id int32) (err error) {
 	}
 
 	qb := model.NewQueryBuilder()
-	qb.WhereId(mysql.EqualPredicate, id)
+	qb.WhereId("=", id)
 	err = qb.Updates(s.db.GetDbW().WithContext(ctx.RequestContext()), data)
 	if err != nil {
 		return err

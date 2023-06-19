@@ -2,10 +2,10 @@ package interceptor
 
 import (
 	"go-porter/internal/app/service/admin"
-	"go-porter/internal/pkg/core"
-	"go-porter/internal/pkg/mysql"
-	"go-porter/internal/pkg/proposal"
-	"go-porter/internal/pkg/redis"
+	"go-porter/pkg/core/pkg/cache/redis"
+	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/database/mysql"
+	"go-porter/pkg/core/pkg/proposal"
 
 	"go.uber.org/zap"
 )

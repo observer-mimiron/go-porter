@@ -1,16 +1,16 @@
 package admin
 
 import (
+	"go-porter/configs"
+	"go-porter/pkg/core/pkg/core"
 	"net/http"
 
-	"go-porter/configs"
 	"go-porter/internal/app/service/admin"
 	"go-porter/internal/code"
-	"go-porter/internal/pkg/core"
 	"go-porter/internal/pkg/password"
-	"go-porter/internal/pkg/proposal"
-	"go-porter/internal/pkg/redis"
-	"go-porter/pkg/errors"
+	"go-porter/pkg/core/pkg/cache/redis"
+	"go-porter/pkg/core/pkg/errors"
+	"go-porter/pkg/core/pkg/proposal"
 )
 
 type loginRequest struct {

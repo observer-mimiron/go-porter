@@ -1,12 +1,12 @@
 package admin
 
 import (
-	"go-porter/configs"
 	"go-porter/internal/app/service/admin"
-	"go-porter/internal/pkg/core"
-	"go-porter/internal/pkg/mysql"
-	"go-porter/internal/pkg/redis"
-	"go-porter/pkg/hash"
+	"go-porter/pkg/core/pkg/cache/redis"
+	"go-porter/pkg/core/pkg/conf"
+	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/database/mysql"
+	"go-porter/pkg/cryptor/hash"
 
 	"go.uber.org/zap"
 )
@@ -81,7 +81,7 @@ func New(logger *zap.Logger, db mysql.Repo, cache redis.Repo) Handler {
 	return &handler{
 		logger:       logger,
 		cache:        cache,
-		hashids:      hash.New(configs.Get().HashIds.Secret, configs.Get().HashIds.Length),
+		hashids:      hash.New(conf.Get().HashIds.Secret, conf.Get().HashIds.Length),
 		adminService: admin.New(db, cache),
 	}
 }

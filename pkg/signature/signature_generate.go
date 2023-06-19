@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"strings"
 
-	"go-porter/pkg/errors"
+	"go-porter/pkg/core/pkg/errors"
 	"go-porter/pkg/timeutil"
 )
 

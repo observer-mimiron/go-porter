@@ -2,7 +2,7 @@ package router
 
 import (
 	"go-porter/internal/app/api/admin"
-	"go-porter/internal/pkg/core"
+	"go-porter/pkg/core/pkg/core"
 )
 
 //AliasForRecordMetrics 别名 用于记录 metrics

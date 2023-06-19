@@ -2,8 +2,6 @@ package code
 
 import (
 	_ "embed"
-
-	"go-porter/configs"
 )
 
 //#### 错误码为 5 位数
@@ -145,11 +143,5 @@ var CodeText = map[int]string{
 }
 
 func Text(code int) string {
-	lang := configs.Get().Language.Local
-
-	if lang == configs.ZhCN {
-		return CodeText[code]
-	}
-
 	return CodeText[code]
 }
