@@ -3,7 +3,7 @@ package mysql
 import (
 	"time"
 
-	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/net/httpx"
 	"go-porter/pkg/core/pkg/trace"
 	"go-porter/pkg/timeutil"
 
@@ -51,7 +51,7 @@ func before(db *gorm.DB) {
 
 func after(db *gorm.DB) {
 	_ctx := db.Statement.Context
-	ctx, ok := _ctx.(core.StdContext)
+	ctx, ok := _ctx.(httpx.StdContext)
 	if !ok {
 		return
 	}

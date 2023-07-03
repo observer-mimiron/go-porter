@@ -2,7 +2,7 @@ package admin
 
 import (
 	"go-porter/internal/app/model"
-	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/net/httpx"
 )
 
 type SearchData struct {
@@ -13,7 +13,7 @@ type SearchData struct {
 	Mobile   string // 手机号
 }
 
-func (s *service) PageList(ctx core.Context, searchData *SearchData) (listData []*model.Admin, err error) {
+func (s *service) PageList(ctx httpx.Context, searchData *SearchData) (listData []*model.Admin, count int64, err error) {
 
 	page := searchData.Page
 	if page == 0 {
@@ -26,30 +26,26 @@ func (s *service) PageList(ctx core.Context, searchData *SearchData) (listData [
 	}
 
 	offset := (page - 1) * pageSize
-
-	qb := model.NewQueryBuilder()
-	qb.WhereIsDeleted("=", -1)
-
+	qb := s.db.GetDbR().WithContext(ctx.RequestContext()).Model(&model.Admin{})
 	if searchData.Username != "" {
-		qb.WhereUsername("=", searchData.Username)
+		qb.Where("username like ?", "%"+searchData.Username+"%")
 	}
 
 	if searchData.Nickname != "" {
-		qb.WhereNickname("=", searchData.Nickname)
+		qb.Where("nickname like ?", "%"+searchData.Nickname+"%")
 	}
 
 	if searchData.Mobile != "" {
-		qb.WhereMobile("=", searchData.Mobile)
+		qb.Where("mobile = ?", searchData.Mobile)
 	}
 
-	listData, err = qb.
-		Limit(pageSize).
-		Offset(offset).
-		OrderById(false).
-		QueryAll(s.db.GetDbR().WithContext(ctx.RequestContext()))
+	qb.Count(&count)
+	qb.Limit(pageSize).Offset(offset)
+
+	err = qb.Find(&listData).Error
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return
+	return listData, count, nil
 }

@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/net/httpx"
 	"net/http"
 
 	"go-porter/internal/app/service/admin"
@@ -29,12 +29,12 @@ type modifyPersonalInfoResponse struct {
 // @Failure 400 {object} code.Failure
 // @Router /api/admin/modify_personal_info [patch]
 // @Security LoginToken
-func (h *handler) ModifyPersonalInfo() core.HandlerFunc {
-	return func(ctx core.Context) {
+func (h *handler) ModifyPersonalInfo() httpx.HandlerFunc {
+	return func(ctx httpx.Context) {
 		req := new(modifyPersonalInfoRequest)
 		res := new(modifyPersonalInfoResponse)
 		if err := ctx.ShouldBindForm(req); err != nil {
-			ctx.AbortWithError(core.Error(
+			ctx.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.ParamBindError,
 				code.Text(code.ParamBindError)).WithError(err),
@@ -47,7 +47,7 @@ func (h *handler) ModifyPersonalInfo() core.HandlerFunc {
 		modifyData.Mobile = req.Mobile
 
 		if err := h.adminService.ModifyPersonalInfo(ctx, ctx.SessionUserInfo().UserID, modifyData); err != nil {
-			ctx.AbortWithError(core.Error(
+			ctx.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.AdminModifyPersonalInfoError,
 				code.Text(code.AdminModifyPersonalInfoError)).WithError(err),

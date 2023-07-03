@@ -57,7 +57,7 @@ func setupWithLevel(level string) zapcore.Level {
 	}
 }
 
-func setupWithFiles(logConf LogConf) *lumberjack.Logger {
+func setupWithFiles(logConf Conf) *lumberjack.Logger {
 	fileName := logConf.Filename
 	if fileName == "" {
 		fileName = fmt.Sprintf("%s/%s.log", env.Active(), "poter")
@@ -78,7 +78,7 @@ func setupWithFiles(logConf LogConf) *lumberjack.Logger {
 }
 
 // NewJSONLogger return a json-encoder zap logger,
-func NewJSONLogger(logConf LogConf) (*zap.Logger, error) {
+func NewJSONLogger(logConf Conf) (*zap.Logger, error) {
 	//初始化配置
 	opt := &option{level: DefaultLevel, fields: make(map[string]string), timeLayout: DefaultTimeLayout}
 

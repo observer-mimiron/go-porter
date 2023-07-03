@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/net/httpx"
 	"net/http"
 
 	"go-porter/internal/app/service/admin"
@@ -24,8 +24,8 @@ type detailResponse struct {
 // @Failure 400 {object} code.Failure
 // @Router /api/admin/info [get]
 // @Security LoginToken
-func (h *handler) Detail() core.HandlerFunc {
-	return func(ctx core.Context) {
+func (h *handler) Detail() httpx.HandlerFunc {
+	return func(ctx httpx.Context) {
 		res := new(detailResponse)
 
 		searchOneData := new(admin.SearchOneData)
@@ -34,7 +34,7 @@ func (h *handler) Detail() core.HandlerFunc {
 
 		info, err := h.adminService.Detail(ctx, searchOneData)
 		if err != nil {
-			ctx.AbortWithError(core.Error(
+			ctx.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.AdminDetailError,
 				code.Text(code.AdminDetailError)).WithError(err),

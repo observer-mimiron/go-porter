@@ -2,7 +2,7 @@ package admin
 
 import (
 	"go-porter/configs"
-	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/net/httpx"
 	"net/http"
 
 	"go-porter/internal/code"
@@ -29,12 +29,12 @@ type offlineResponse struct {
 // @Failure 400 {object} code.Failure
 // @Router /api/admin/offline [patch]
 // @Security LoginToken
-func (h *handler) Offline() core.HandlerFunc {
-	return func(c core.Context) {
+func (h *handler) Offline() httpx.HandlerFunc {
+	return func(c httpx.Context) {
 		req := new(offlineRequest)
 		res := new(offlineResponse)
 		if err := c.ShouldBindForm(req); err != nil {
-			c.AbortWithError(core.Error(
+			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.ParamBindError,
 				code.Text(code.ParamBindError)).WithError(err),
@@ -44,7 +44,7 @@ func (h *handler) Offline() core.HandlerFunc {
 
 		ids, err := h.hashids.HashidsDecode(req.Id)
 		if err != nil {
-			c.AbortWithError(core.Error(
+			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.HashIdsDecodeError,
 				code.Text(code.HashIdsDecodeError)).WithError(err),
@@ -56,7 +56,7 @@ func (h *handler) Offline() core.HandlerFunc {
 
 		b := h.cache.Del(configs.RedisKeyPrefixLoginUser+password.GenerateLoginToken(id), redis.WithTrace(c.Trace()))
 		if !b {
-			c.AbortWithError(core.Error(
+			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.AdminOfflineError,
 				code.Text(code.AdminOfflineError)),

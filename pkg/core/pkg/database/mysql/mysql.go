@@ -2,15 +2,37 @@ package mysql
 
 import (
 	"fmt"
+	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 	"time"
 
 	"go-porter/pkg/core/pkg/errors"
 
-	"go-porter/pkg/core/pkg/conf"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
+
+type Conf struct {
+	Base `toml:"base"`
+	Read struct {
+		Addr string `toml:"addr"`
+		User string `toml:"user"`
+		Pass string `toml:"pass"`
+		Name string `toml:"name"`
+	} `toml:"read"`
+	Write struct {
+		Addr string `toml:"addr"`
+		User string `toml:"user"`
+		Pass string `toml:"pass"`
+		Name string `toml:"name"`
+	} `toml:"write"`
+}
+
+type Base struct {
+	MaxOpenConn     int           `toml:"maxOpenConn"`
+	MaxIdleConn     int           `toml:"maxIdleConn"`
+	ConnMaxLifeTime time.Duration `toml:"connMaxLifeTime"`
+}
 
 // Predicate is a string that acts as a condition in the where clause
 type Predicate string
@@ -30,15 +52,14 @@ type dbRepo struct {
 	DbW *gorm.DB
 }
 
-func New() (Repo, error) {
-	cfg := conf.Get().MySQL
-	dbr, err := dbConnect(cfg.Read.User, cfg.Read.Pass, cfg.Read.Addr, cfg.Read.Name)
+func New(cfg Conf) (Repo, error) {
+	dbr, err := dbConnect(cfg.Base, cfg.Read.User, cfg.Read.Pass, cfg.Read.Addr, cfg.Read.Name)
 	if err != nil {
 		panic(err)
 		return nil, err
 	}
 
-	dbw, err := dbConnect(cfg.Write.User, cfg.Write.Pass, cfg.Write.Addr, cfg.Write.Name)
+	dbw, err := dbConnect(cfg.Base, cfg.Write.User, cfg.Write.Pass, cfg.Write.Addr, cfg.Write.Name)
 	if err != nil {
 		panic(err)
 		return nil, err
@@ -75,7 +96,7 @@ func (d *dbRepo) DbWClose() error {
 	return sqlDB.Close()
 }
 
-func dbConnect(user, pass, addr, dbName string) (*gorm.DB, error) {
+func dbConnect(base Base, user, pass, addr, dbName string) (*gorm.DB, error) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=%t&loc=%s",
 		user,
 		pass,
@@ -87,7 +108,7 @@ func dbConnect(user, pass, addr, dbName string) (*gorm.DB, error) {
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
-		//Logger: logger.Default.LogMode(logger.Info), // 日志配置
+		Logger: logger.Default.LogMode(logger.Info), // 日志配置
 	})
 
 	if err != nil {
@@ -96,21 +117,19 @@ func dbConnect(user, pass, addr, dbName string) (*gorm.DB, error) {
 
 	db.Set("gorm:table_options", "CHARSET=utf8mb4")
 
-	cfg := conf.Get().MySQL.Base
-
 	sqlDB, err := db.DB()
 	if err != nil {
 		return nil, err
 	}
 
 	// 设置连接池 用于设置最大打开的连接数，默认值为0表示不限制.设置最大的连接数，可以避免并发太高导致连接mysql出现too many connections的错误。
-	sqlDB.SetMaxOpenConns(cfg.MaxOpenConn)
+	sqlDB.SetMaxOpenConns(base.MaxOpenConn)
 
 	// 设置最大连接数 用于设置闲置的连接数.设置闲置的连接数则当开启的一个连接使用完成后可以放在池里等候下一次使用。
-	sqlDB.SetMaxIdleConns(cfg.MaxIdleConn)
+	sqlDB.SetMaxIdleConns(base.MaxIdleConn)
 
 	// 设置最大连接超时
-	sqlDB.SetConnMaxLifetime(time.Minute * cfg.ConnMaxLifeTime)
+	sqlDB.SetConnMaxLifetime(time.Minute * base.ConnMaxLifeTime)
 
 	// 使用插件
 	err = db.Use(&TracePlugin{})

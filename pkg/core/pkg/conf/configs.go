@@ -2,12 +2,13 @@ package conf
 
 import (
 	_ "embed"
+	"go-porter/pkg/core/pkg/cache/redis"
+	"go-porter/pkg/core/pkg/database/mysql"
 	"go-porter/pkg/core/pkg/logger"
+	"go-porter/pkg/cryptor/hash"
+	"go-porter/pkg/file"
 	"os"
 	"path/filepath"
-	"time"
-
-	"go-porter/pkg/file"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
@@ -20,47 +21,13 @@ type Config struct {
 	Host string `toml:"host"`
 	Port string `toml:"port"`
 
-	MySQL `toml:"mysql"`
+	HashIds hash.Conf `toml:"hashids"`
 
-	Redis `toml:"redis"`
+	MySQL mysql.Conf `toml:"mysql"`
 
-	HashIds `toml:"hashids"`
+	Redis redis.Conf `toml:"redis"`
 
-	Log logger.LogConf `toml:"log"`
-}
-
-type MySQL struct {
-	Read struct {
-		Addr string `toml:"addr"`
-		User string `toml:"user"`
-		Pass string `toml:"pass"`
-		Name string `toml:"name"`
-	} `toml:"read"`
-	Write struct {
-		Addr string `toml:"addr"`
-		User string `toml:"user"`
-		Pass string `toml:"pass"`
-		Name string `toml:"name"`
-	} `toml:"write"`
-	Base struct {
-		MaxOpenConn     int           `toml:"maxOpenConn"`
-		MaxIdleConn     int           `toml:"maxIdleConn"`
-		ConnMaxLifeTime time.Duration `toml:"connMaxLifeTime"`
-	} `toml:"base"`
-}
-
-type Redis struct {
-	Addr         string `toml:"addr"`
-	Pass         string `toml:"pass"`
-	Db           int    `toml:"db"`
-	MaxRetries   int    `toml:"maxRetries"`
-	PoolSize     int    `toml:"poolSize"`
-	MinIdleConns int    `toml:"minIdleConns"`
-}
-
-type HashIds struct {
-	Secret string `toml:"secret"`
-	Length int    `toml:"length"`
+	Log logger.Conf `toml:"log"`
 }
 
 //func init() {

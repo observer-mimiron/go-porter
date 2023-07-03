@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/net/httpx"
 	"net/http"
 
 	"go-porter/internal/app/service/admin"
@@ -30,12 +30,12 @@ type modifyPasswordResponse struct {
 // @Failure 400 {object} code.Failure
 // @Router /api/admin/modify_password [patch]
 // @Security LoginToken
-func (h *handler) ModifyPassword() core.HandlerFunc {
-	return func(ctx core.Context) {
+func (h *handler) ModifyPassword() httpx.HandlerFunc {
+	return func(ctx httpx.Context) {
 		req := new(modifyPasswordRequest)
 		res := new(modifyPasswordResponse)
 		if err := ctx.ShouldBindForm(req); err != nil {
-			ctx.AbortWithError(core.Error(
+			ctx.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.ParamBindError,
 				code.Text(code.ParamBindError)).WithError(err),
@@ -50,7 +50,7 @@ func (h *handler) ModifyPassword() core.HandlerFunc {
 
 		info, err := h.adminService.Detail(ctx, searchOneData)
 		if err != nil || info == nil {
-			ctx.AbortWithError(core.Error(
+			ctx.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.AdminModifyPasswordError,
 				code.Text(code.AdminModifyPasswordError)).WithError(err),
@@ -59,7 +59,7 @@ func (h *handler) ModifyPassword() core.HandlerFunc {
 		}
 
 		if err := h.adminService.ModifyPassword(ctx, ctx.SessionUserInfo().UserID, req.NewPassword); err != nil {
-			ctx.AbortWithError(core.Error(
+			ctx.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.AdminModifyPasswordError,
 				code.Text(code.AdminModifyPasswordError)).WithError(err),

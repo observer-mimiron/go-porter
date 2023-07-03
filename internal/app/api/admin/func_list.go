@@ -2,7 +2,7 @@ package admin
 
 import (
 	"go-porter/configs"
-	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/net/httpx"
 	"net/http"
 
 	"go-porter/internal/app/service/admin"
@@ -59,12 +59,12 @@ type listResponse struct {
 // @Failure 400 {object} code.Failure
 // @Router /api/admin [get]
 // @Security LoginToken
-func (h *handler) List() core.HandlerFunc {
-	return func(c core.Context) {
+func (h *handler) List() httpx.HandlerFunc {
+	return func(c httpx.Context) {
 		req := new(listRequest)
 		res := new(listResponse)
 		if err := c.ShouldBindForm(req); err != nil {
-			c.AbortWithError(core.Error(
+			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.ParamBindError,
 				code.Text(code.ParamBindError)).WithError(err),
@@ -89,9 +89,9 @@ func (h *handler) List() core.HandlerFunc {
 		searchData.Nickname = req.Nickname
 		searchData.Mobile = req.Mobile
 
-		resListData, err := h.adminService.PageList(c, searchData)
+		resListData, resCountData, err := h.adminService.PageList(c, searchData)
 		if err != nil {
-			c.AbortWithError(core.Error(
+			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.AdminListError,
 				code.Text(code.AdminListError)).WithError(err),
@@ -99,15 +99,6 @@ func (h *handler) List() core.HandlerFunc {
 			return
 		}
 
-		resCountData, err := h.adminService.PageListCount(c, searchData)
-		if err != nil {
-			c.AbortWithError(core.Error(
-				http.StatusBadRequest,
-				code.AdminListError,
-				code.Text(code.AdminListError)).WithError(err),
-			)
-			return
-		}
 		res.Pagination.Total = cast.ToInt(resCountData)
 		res.Pagination.PerPageCount = pageSize
 		res.Pagination.CurrentPage = page
@@ -116,7 +107,7 @@ func (h *handler) List() core.HandlerFunc {
 		for k, v := range resListData {
 			hashId, err := h.hashids.HashidsEncode([]int{cast.ToInt(v.Id)})
 			if err != nil {
-				c.AbortWithError(core.Error(
+				c.AbortWithError(httpx.Error(
 					http.StatusBadRequest,
 					code.HashIdsEncodeError,
 					code.Text(code.HashIdsEncodeError)).WithError(err),

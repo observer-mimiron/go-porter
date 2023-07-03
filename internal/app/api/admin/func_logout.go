@@ -2,7 +2,7 @@ package admin
 
 import (
 	"go-porter/configs"
-	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/net/httpx"
 	"net/http"
 
 	"go-porter/internal/code"
@@ -24,13 +24,13 @@ type logoutResponse struct {
 // @Failure 400 {object} code.Failure
 // @Router /api/admin/logout [post]
 // @Security LoginToken
-func (h *handler) Logout() core.HandlerFunc {
-	return func(c core.Context) {
+func (h *handler) Logout() httpx.HandlerFunc {
+	return func(c httpx.Context) {
 		res := new(logoutResponse)
 		res.Username = c.SessionUserInfo().UserName
 
 		if !h.cache.Del(configs.RedisKeyPrefixLoginUser+c.GetHeader(configs.HeaderLoginToken), redis.WithTrace(c.Trace())) {
-			c.AbortWithError(core.Error(
+			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.AdminLogOutError,
 				code.Text(code.AdminLogOutError)).WithError(errors.New("cache del err")),

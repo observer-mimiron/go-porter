@@ -5,18 +5,16 @@ import (
 	"go-porter/internal/app/model"
 	"go-porter/internal/pkg/password"
 	"go-porter/pkg/core/pkg/cache/redis"
-	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/net/httpx"
 )
 
-func (s *service) ModifyPassword(ctx core.Context, id int32, newPassword string) (err error) {
+func (s *service) ModifyPassword(ctx httpx.Context, id int32, newPassword string) (err error) {
 	data := map[string]interface{}{
 		"password":     password.GeneratePassword(newPassword),
 		"updated_user": ctx.SessionUserInfo().UserName,
 	}
 
-	qb := model.NewQueryBuilder()
-	qb.WhereId("=", id)
-	err = qb.Updates(s.db.GetDbW().WithContext(ctx.RequestContext()), data)
+	err = s.db.GetDbW().WithContext(ctx.RequestContext()).Model(&model.Admin{}).Where("id = ?", id).Updates(data).Error
 	if err != nil {
 		return err
 	}

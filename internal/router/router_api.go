@@ -2,7 +2,7 @@ package router
 
 import (
 	"go-porter/internal/app/api/admin"
-	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/net/httpx"
 )
 
 //AliasForRecordMetrics 别名 用于记录 metrics
@@ -18,7 +18,7 @@ func setApiRouter(r *resource) {
 	}
 
 	// 需要签名验证、登录验证
-	notRBAC := r.mux.Group("/api", core.WrapAuthHandler(r.interceptors.CheckLogin))
+	notRBAC := r.mux.Group("/api", httpx.WrapAuthHandler(r.interceptors.CheckLogin))
 	{
 		notRBAC.POST("/admin/logout", adminHandler.Logout())
 		notRBAC.PATCH("/admin/modify_password", adminHandler.ModifyPassword())

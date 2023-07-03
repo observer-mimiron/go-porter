@@ -3,7 +3,7 @@ package admin
 import (
 	"go-porter/internal/app/model"
 	"go-porter/internal/pkg/password"
-	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/net/httpx"
 )
 
 type CreateAdminData struct {
@@ -13,19 +13,19 @@ type CreateAdminData struct {
 	Password string // 密码
 }
 
-func (s *service) Create(ctx core.Context, adminData *CreateAdminData) (id int32, err error) {
-	model := model.NewModel()
-	model.Username = adminData.Username
-	model.Password = password.GeneratePassword(adminData.Password)
-	model.Nickname = adminData.Nickname
-	model.Mobile = adminData.Mobile
-	model.CreatedUser = ctx.SessionUserInfo().UserName
-	model.IsUsed = 1
-	model.IsDeleted = -1
+func (s *service) Create(ctx httpx.Context, adminData *CreateAdminData) (id int32, err error) {
+	admin := new(model.Admin)
+	admin.Username = adminData.Username
+	admin.Password = password.GeneratePassword(adminData.Password)
+	admin.Nickname = adminData.Nickname
+	admin.Mobile = adminData.Mobile
+	admin.CreatedUser = ctx.SessionUserInfo().UserName
+	admin.IsUsed = 1
+	admin.IsDeleted = -1
 
-	id, err = model.Create(s.db.GetDbW().WithContext(ctx.RequestContext()))
+	err = s.db.GetDbW().Create(admin).Error
 	if err != nil {
 		return 0, err
 	}
-	return
+	return admin.Id, nil
 }

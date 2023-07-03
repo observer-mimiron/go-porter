@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/net/httpx"
 	"net/http"
 
 	"go-porter/internal/code"
@@ -26,12 +26,12 @@ type resetPasswordResponse struct {
 // @Failure 400 {object} code.Failure
 // @Router /api/admin/reset_password/{id} [patch]
 // @Security LoginToken
-func (h *handler) ResetPassword() core.HandlerFunc {
-	return func(c core.Context) {
+func (h *handler) ResetPassword() httpx.HandlerFunc {
+	return func(c httpx.Context) {
 		req := new(resetPasswordRequest)
 		res := new(resetPasswordResponse)
 		if err := c.ShouldBindURI(req); err != nil {
-			c.AbortWithError(core.Error(
+			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.ParamBindError,
 				code.Text(code.ParamBindError)).WithError(err),
@@ -41,7 +41,7 @@ func (h *handler) ResetPassword() core.HandlerFunc {
 
 		ids, err := h.hashids.HashidsDecode(req.Id)
 		if err != nil {
-			c.AbortWithError(core.Error(
+			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.HashIdsDecodeError,
 				code.Text(code.HashIdsDecodeError)).WithError(err),
@@ -53,7 +53,7 @@ func (h *handler) ResetPassword() core.HandlerFunc {
 
 		err = h.adminService.ResetPassword(c, id)
 		if err != nil {
-			c.AbortWithError(core.Error(
+			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.AdminResetPasswordError,
 				code.Text(code.AdminResetPasswordError)).WithError(err),

@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/net/httpx"
 	"net/http"
 
 	"go-porter/internal/code"
@@ -28,12 +28,12 @@ type updateUsedResponse struct {
 // @Failure 400 {object} code.Failure
 // @Router /api/admin/used [patch]
 // @Security LoginToken
-func (h *handler) UpdateUsed() core.HandlerFunc {
-	return func(c core.Context) {
+func (h *handler) UpdateUsed() httpx.HandlerFunc {
+	return func(c httpx.Context) {
 		req := new(updateUsedRequest)
 		res := new(updateUsedResponse)
 		if err := c.ShouldBindForm(req); err != nil {
-			c.AbortWithError(core.Error(
+			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.ParamBindError,
 				code.Text(code.ParamBindError)).WithError(err),
@@ -43,7 +43,7 @@ func (h *handler) UpdateUsed() core.HandlerFunc {
 
 		ids, err := h.hashids.HashidsDecode(req.Id)
 		if err != nil {
-			c.AbortWithError(core.Error(
+			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.HashIdsDecodeError,
 				code.Text(code.HashIdsDecodeError)).WithError(err),
@@ -55,7 +55,7 @@ func (h *handler) UpdateUsed() core.HandlerFunc {
 
 		err = h.adminService.UpdateUsed(c, id, req.Used)
 		if err != nil {
-			c.AbortWithError(core.Error(
+			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.AdminUpdateError,
 				code.Text(code.AdminUpdateError)).WithError(err),

@@ -1,6 +1,6 @@
 package logger
 
-type LogConf struct {
+type Conf struct {
 	Model      string `toml:"model"`      // console, file
 	Level      string `toml:"level"`      // debug, info, warn, error, dpanic, panic, fatal
 	Filename   string `toml:"filename"`   // log file name

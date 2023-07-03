@@ -1,12 +1,11 @@
 package admin
 
 import (
-	"go-porter/pkg/core/pkg/core"
-	"net/http"
-
 	"go-porter/internal/app/service/admin"
 	"go-porter/internal/code"
 	"go-porter/internal/pkg/validation"
+	"go-porter/pkg/core/pkg/net/httpx"
+	"net/http"
 )
 
 type createRequest struct {
@@ -34,12 +33,12 @@ type createResponse struct {
 // @Failure 400 {object} code.Failure
 // @Router /api/admin [post]
 // @Security LoginToken
-func (h *handler) Create() core.HandlerFunc {
-	return func(c core.Context) {
+func (h *handler) Create() httpx.HandlerFunc {
+	return func(c httpx.Context) {
 		req := new(createRequest)
 		res := new(createResponse)
 		if err := c.ShouldBindForm(req); err != nil {
-			c.AbortWithError(core.Error(
+			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.ParamBindError,
 				validation.Error(err)).WithError(err),
@@ -55,7 +54,7 @@ func (h *handler) Create() core.HandlerFunc {
 
 		id, err := h.adminService.Create(c, createData)
 		if err != nil {
-			c.AbortWithError(core.Error(
+			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.AdminCreateError,
 				code.Text(code.AdminCreateError)).WithError(err),

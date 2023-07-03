@@ -2,7 +2,7 @@ package admin
 
 import (
 	"go-porter/internal/app/model"
-	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/net/httpx"
 )
 
 type ModifyData struct {
@@ -10,16 +10,14 @@ type ModifyData struct {
 	Mobile   string // 手机号
 }
 
-func (s *service) ModifyPersonalInfo(ctx core.Context, id int32, modifyData *ModifyData) (err error) {
+func (s *service) ModifyPersonalInfo(ctx httpx.Context, id int32, modifyData *ModifyData) (err error) {
 	data := map[string]interface{}{
 		"nickname":     modifyData.Nickname,
 		"mobile":       modifyData.Mobile,
 		"updated_user": ctx.SessionUserInfo().UserName,
 	}
 
-	qb := model.NewQueryBuilder()
-	qb.WhereId("=", id)
-	err = qb.Updates(s.db.GetDbW().WithContext(ctx.RequestContext()), data)
+	err = s.db.GetDbW().WithContext(ctx.RequestContext()).Model(&model.Admin{}).Where("id = ?", id).Updates(data).Error
 	if err != nil {
 		return err
 	}

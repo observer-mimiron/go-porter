@@ -2,7 +2,7 @@ package admin
 
 import (
 	"go-porter/configs"
-	"go-porter/pkg/core/pkg/core"
+	"go-porter/pkg/core/pkg/net/httpx"
 	"net/http"
 
 	"go-porter/internal/app/service/admin"
@@ -34,12 +34,12 @@ type loginResponse struct {
 // @Failure 400 {object} code.Failure
 // @Router /api/login [post]
 // @Security LoginToken
-func (h *handler) Login() core.HandlerFunc {
-	return func(c core.Context) {
+func (h *handler) Login() httpx.HandlerFunc {
+	return func(c httpx.Context) {
 		req := new(loginRequest)
 		res := new(loginResponse)
 		if err := c.ShouldBindForm(req); err != nil {
-			c.AbortWithError(core.Error(
+			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.ParamBindError,
 				code.Text(code.ParamBindError)).WithError(err),
@@ -53,7 +53,7 @@ func (h *handler) Login() core.HandlerFunc {
 		searchOneData.IsUsed = 1
 		info, err := h.adminService.Detail(c, searchOneData)
 		if err != nil {
-			c.AbortWithError(core.Error(
+			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.AdminLoginError,
 				code.Text(code.AdminLoginError)).WithError(err),
@@ -62,7 +62,7 @@ func (h *handler) Login() core.HandlerFunc {
 		}
 
 		if info == nil {
-			c.AbortWithError(core.Error(
+			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.AdminLoginError,
 				code.Text(code.AdminLoginError)).WithError(errors.New("未查询出符合条件的用户")),
@@ -81,7 +81,7 @@ func (h *handler) Login() core.HandlerFunc {
 		// 将用户信息记录到 Redis 中
 		err = h.cache.Set(configs.RedisKeyPrefixLoginUser+token, string(sessionUserInfo.Marshal()), configs.LoginSessionTTL, redis.WithTrace(c.Trace()))
 		if err != nil {
-			c.AbortWithError(core.Error(
+			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.AdminLoginError,
 				code.Text(code.AdminLoginError)).WithError(err),

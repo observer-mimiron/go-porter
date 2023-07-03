@@ -1,7 +1,6 @@
 package redis
 
 import (
-	"go-porter/pkg/core/pkg/conf"
 	"strings"
 	"time"
 
@@ -11,6 +10,15 @@ import (
 
 	"github.com/go-redis/redis/v7"
 )
+
+type Conf struct {
+	Addr         string `toml:"addr"`
+	Pass         string `toml:"pass"`
+	Db           int    `toml:"db"`
+	MaxRetries   int    `toml:"maxRetries"`
+	PoolSize     int    `toml:"poolSize"`
+	MinIdleConns int    `toml:"minIdleConns"`
+}
 
 type Option func(*option)
 
@@ -45,8 +53,8 @@ type cacheRepo struct {
 	client *redis.Client
 }
 
-func New() (Repo, error) {
-	client, err := redisConnect()
+func New(cfg Conf) (Repo, error) {
+	client, err := redisConnect(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -58,8 +66,7 @@ func New() (Repo, error) {
 
 func (c *cacheRepo) i() {}
 
-func redisConnect() (*redis.Client, error) {
-	cfg := conf.Get().Redis
+func redisConnect(cfg Conf) (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:         cfg.Addr,
 		Password:     cfg.Pass,

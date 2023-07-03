@@ -2,6 +2,10 @@ package hash
 
 var _ Hash = (*hash)(nil)
 
+type Conf struct {
+	Secret string `toml:"secret"`
+	Length int    `toml:"length"`
+}
 type Hash interface {
 	i()
 

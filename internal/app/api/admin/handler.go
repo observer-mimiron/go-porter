@@ -4,8 +4,8 @@ import (
 	"go-porter/internal/app/service/admin"
 	"go-porter/pkg/core/pkg/cache/redis"
 	"go-porter/pkg/core/pkg/conf"
-	"go-porter/pkg/core/pkg/core"
 	"go-porter/pkg/core/pkg/database/mysql"
+	"go-porter/pkg/core/pkg/net/httpx"
 	"go-porter/pkg/cryptor/hash"
 
 	"go.uber.org/zap"
@@ -17,57 +17,57 @@ type Handler interface {
 	// Login 管理员登录
 	// @Tags API.admin
 	// @Router /api/login [post]
-	Login() core.HandlerFunc
+	Login() httpx.HandlerFunc
 
 	// Logout 管理员登出
 	// @Tags API.admin
 	// @Router /api/admin/logout [post]
-	Logout() core.HandlerFunc
+	Logout() httpx.HandlerFunc
 
 	// ModifyPassword 修改密码
 	// @Tags API.admin
 	// @Router /api/admin/modify_password [patch]
-	ModifyPassword() core.HandlerFunc
+	ModifyPassword() httpx.HandlerFunc
 
 	// Detail 个人信息
 	// @Tags API.admin
 	// @Router /api/admin/info [get]
-	Detail() core.HandlerFunc
+	Detail() httpx.HandlerFunc
 
 	// ModifyPersonalInfo 修改个人信息
 	// @Tags API.admin
 	// @Router /api/admin/modify_personal_info [patch]
-	ModifyPersonalInfo() core.HandlerFunc
+	ModifyPersonalInfo() httpx.HandlerFunc
 
 	// Create 新增管理员
 	// @Tags API.admin
 	// @Router /api/admin [post]
-	Create() core.HandlerFunc
+	Create() httpx.HandlerFunc
 
 	// List 管理员列表
 	// @Tags API.admin
 	// @Router /api/admin [get]
-	List() core.HandlerFunc
+	List() httpx.HandlerFunc
 
 	// Delete 删除管理员
 	// @Tags API.admin
 	// @Router /api/admin/{id} [delete]
-	Delete() core.HandlerFunc
+	Delete() httpx.HandlerFunc
 
 	// Offline 下线管理员
 	// @Tags API.admin
 	// @Router /api/admin/offline [patch]
-	Offline() core.HandlerFunc
+	Offline() httpx.HandlerFunc
 
 	// UpdateUsed 更新管理员为启用/禁用
 	// @Tags API.admin
 	// @Router /api/admin/used [patch]
-	UpdateUsed() core.HandlerFunc
+	UpdateUsed() httpx.HandlerFunc
 
 	// ResetPassword 重置密码
 	// @Tags API.admin
 	// @Router /api/admin/reset_password/{id} [patch]
-	ResetPassword() core.HandlerFunc
+	ResetPassword() httpx.HandlerFunc
 }
 
 type handler struct {
