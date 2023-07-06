@@ -1,8 +1,11 @@
-package interceptor
+package Middleware
 
 import (
 	"encoding/json"
 	"go-porter/configs"
+	"go-porter/internal/app/service/admin"
+	"go-porter/pkg/core/pkg/database/mysql"
+	"go.uber.org/zap"
 	"net/http"
 
 	"go-porter/internal/code"
@@ -12,7 +15,32 @@ import (
 	"go-porter/pkg/core/pkg/proposal"
 )
 
-func (i *interceptor) CheckLogin(ctx httpx.Context) (sessionUserInfo proposal.SessionUserInfo, err httpx.BusinessError) {
+var _ Authenticate = (*authenticate)(nil)
+
+type Authenticate interface {
+	// CheckLogin 验证是否登录
+	CheckLogin(ctx httpx.Context) (info proposal.SessionUserInfo, err httpx.BusinessError)
+}
+
+type authenticate struct {
+	logger       *zap.Logger
+	cache        redis.Repo
+	db           mysql.Repo
+	adminService admin.Service
+}
+
+func New(logger *zap.Logger, cache redis.Repo, db mysql.Repo) Authenticate {
+	return &authenticate{
+		logger:       logger,
+		cache:        cache,
+		db:           db,
+		adminService: admin.New(db, cache),
+	}
+}
+
+func (i *authenticate) i() {}
+
+func (i *authenticate) CheckLogin(ctx httpx.Context) (sessionUserInfo proposal.SessionUserInfo, err httpx.BusinessError) {
 	token := ctx.GetHeader(configs.HeaderLoginToken)
 	if token == "" {
 		err = httpx.Error(
