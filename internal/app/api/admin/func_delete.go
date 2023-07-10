@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"go-porter/internal/app/service/admin"
 	"go-porter/pkg/core/pkg/net/httpx"
 	"net/http"
 
@@ -50,8 +51,8 @@ func (h *handler) Delete() httpx.HandlerFunc {
 		}
 
 		id := int32(ids[0])
-
-		err = h.adminService.Delete(c, id)
+		adminService := admin.New(h.svcCtx)
+		err = adminService.Delete(c, id)
 		if err != nil {
 			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,

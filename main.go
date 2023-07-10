@@ -25,10 +25,10 @@ func main() {
 	c := conf.Get()
 
 	// 初始化服务组件
-	serviceCtx := svc.NewServiceContext(c)
+	svcCtx := svc.NewServiceContext(c)
 
 	//开启相关功能组
-	mux, err := httpx.New(serviceCtx.Logger,
+	mux, err := httpx.New(svcCtx.Logger,
 		//httpx.WithDisablePrometheus(), // 关闭 prometheus
 		//httpx.WithDisablePProf(),      // 关闭 WithDisablePProf
 		httpx.WithEnableCors(), //跨域
@@ -42,11 +42,11 @@ func main() {
 
 	defer func() {
 		// 确保关闭时日志已经刷到磁盘
-		_ = serviceCtx.Logger.Sync()
+		_ = svcCtx.Logger.Sync()
 	}()
 
 	// 初始化 router
-	router.SetApiRouter(serviceCtx, mux)
+	router.SetApiRouter(svcCtx, mux)
 
 	// 配置 http server
 	server := &http.Server{
@@ -57,7 +57,7 @@ func main() {
 	// 启动 http server
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			serviceCtx.Logger.Fatal("http server startup err", zap.Error(err))
+			svcCtx.Logger.Fatal("http server startup err", zap.Error(err))
 		}
 	}()
 
@@ -69,28 +69,28 @@ func main() {
 			defer cancel()
 
 			if err := server.Shutdown(ctx); err != nil {
-				serviceCtx.Logger.Error("server shutdown err", zap.Error(err))
+				svcCtx.Logger.Error("server shutdown err", zap.Error(err))
 			}
 		},
 
 		// 关闭 db
 		func() {
-			if serviceCtx.Db != nil {
-				if err := serviceCtx.Db.DbWClose(); err != nil {
-					serviceCtx.Logger.Error("dbw close err", zap.Error(err))
+			if svcCtx.Db != nil {
+				if err := svcCtx.Db.DbWClose(); err != nil {
+					svcCtx.Logger.Error("dbw close err", zap.Error(err))
 				}
 
-				if err := serviceCtx.Db.DbRClose(); err != nil {
-					serviceCtx.Logger.Error("dbr close err", zap.Error(err))
+				if err := svcCtx.Db.DbRClose(); err != nil {
+					svcCtx.Logger.Error("dbr close err", zap.Error(err))
 				}
 			}
 		},
 
 		// 关闭 redis
 		func() {
-			if serviceCtx.Redis != nil {
-				if err := serviceCtx.Redis.Close(); err != nil {
-					serviceCtx.Logger.Error("cache close err", zap.Error(err))
+			if svcCtx.Redis != nil {
+				if err := svcCtx.Redis.Close(); err != nil {
+					svcCtx.Logger.Error("cache close err", zap.Error(err))
 				}
 			}
 		},

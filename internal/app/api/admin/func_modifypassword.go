@@ -48,7 +48,8 @@ func (h *handler) ModifyPassword() httpx.HandlerFunc {
 		searchOneData.Password = password.GeneratePassword(req.OldPassword)
 		searchOneData.IsUsed = 1
 
-		info, err := h.adminService.Detail(ctx, searchOneData)
+		adminService := admin.New(h.svcCtx)
+		info, err := adminService.Detail(ctx, searchOneData)
 		if err != nil || info == nil {
 			ctx.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
@@ -58,7 +59,7 @@ func (h *handler) ModifyPassword() httpx.HandlerFunc {
 			return
 		}
 
-		if err := h.adminService.ModifyPassword(ctx, ctx.SessionUserInfo().UserID, req.NewPassword); err != nil {
+		if err := adminService.ModifyPassword(ctx, ctx.SessionUserInfo().UserID, req.NewPassword); err != nil {
 			ctx.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.AdminModifyPasswordError,

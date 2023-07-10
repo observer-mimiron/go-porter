@@ -32,7 +32,8 @@ func (h *handler) Detail() httpx.HandlerFunc {
 		searchOneData.Id = ctx.SessionUserInfo().UserID
 		searchOneData.IsUsed = 1
 
-		info, err := h.adminService.Detail(ctx, searchOneData)
+		adminService := admin.New(h.svcCtx)
+		info, err := adminService.Detail(ctx, searchOneData)
 		if err != nil {
 			ctx.AbortWithError(httpx.Error(
 				http.StatusBadRequest,

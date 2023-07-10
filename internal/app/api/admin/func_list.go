@@ -89,7 +89,8 @@ func (h *handler) List() httpx.HandlerFunc {
 		searchData.Nickname = req.Nickname
 		searchData.Mobile = req.Mobile
 
-		resListData, resCountData, err := h.adminService.PageList(c, searchData)
+		adminService := admin.New(h.svcCtx)
+		resListData, resCountData, err := adminService.PageList(c, searchData)
 		if err != nil {
 			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
@@ -116,7 +117,7 @@ func (h *handler) List() httpx.HandlerFunc {
 			}
 
 			isOnline := -1
-			if h.cache.Exists(configs.RedisKeyPrefixLoginUser + password.GenerateLoginToken(v.Id)) {
+			if h.svcCtx.Redis.Exists(configs.RedisKeyPrefixLoginUser + password.GenerateLoginToken(v.Id)) {
 				isOnline = 1
 			}
 

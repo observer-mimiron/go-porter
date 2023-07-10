@@ -51,7 +51,9 @@ func (h *handler) Login() httpx.HandlerFunc {
 		searchOneData.Username = req.Username
 		searchOneData.Password = password.GeneratePassword(req.Password)
 		searchOneData.IsUsed = 1
-		info, err := h.adminService.Detail(c, searchOneData)
+
+		adminService := admin.New(h.svcCtx)
+		info, err := adminService.Detail(c, searchOneData)
 		if err != nil {
 			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
@@ -79,7 +81,7 @@ func (h *handler) Login() httpx.HandlerFunc {
 		}
 
 		// 将用户信息记录到 Redis 中
-		err = h.cache.Set(configs.RedisKeyPrefixLoginUser+token, string(sessionUserInfo.Marshal()), configs.LoginSessionTTL, redis.WithTrace(c.Trace()))
+		err = h.svcCtx.Redis.Set(configs.RedisKeyPrefixLoginUser+token, string(sessionUserInfo.Marshal()), configs.LoginSessionTTL, redis.WithTrace(c.Trace()))
 		if err != nil {
 			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,

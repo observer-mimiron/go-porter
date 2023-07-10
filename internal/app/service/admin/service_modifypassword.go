@@ -14,11 +14,11 @@ func (s *service) ModifyPassword(ctx httpx.Context, id int32, newPassword string
 		"updated_user": ctx.SessionUserInfo().UserName,
 	}
 
-	err = s.db.GetDbW().WithContext(ctx.RequestContext()).Model(&model.Admin{}).Where("id = ?", id).Updates(data).Error
+	err = s.svc.Db.GetDbW().WithContext(ctx.RequestContext()).Model(&model.Admin{}).Where("id = ?", id).Updates(data).Error
 	if err != nil {
 		return err
 	}
 
-	s.cache.Del(configs.RedisKeyPrefixLoginUser+password.GenerateLoginToken(id), redis.WithTrace(ctx.Trace()))
+	s.svc.Redis.Del(configs.RedisKeyPrefixLoginUser+password.GenerateLoginToken(id), redis.WithTrace(ctx.Trace()))
 	return
 }

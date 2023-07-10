@@ -29,7 +29,7 @@ func (h *handler) Logout() httpx.HandlerFunc {
 		res := new(logoutResponse)
 		res.Username = c.SessionUserInfo().UserName
 
-		if !h.cache.Del(configs.RedisKeyPrefixLoginUser+c.GetHeader(configs.HeaderLoginToken), redis.WithTrace(c.Trace())) {
+		if !h.svcCtx.Redis.Del(configs.RedisKeyPrefixLoginUser+c.GetHeader(configs.HeaderLoginToken), redis.WithTrace(c.Trace())) {
 			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.AdminLogOutError,

@@ -10,9 +10,9 @@ import (
 	AliasForRecordMetrics 别名 用于记录 metrics
 	WrapAuthHandler 权限验证
 **/
-func SetApiRouter(svc *svc.ServiceContext, mux httpx.Mux) {
+func SetApiRouter(svcCtx *svc.ServiceContext, mux httpx.Mux) {
 	// admin
-	adminHandler := admin.New(svc.Logger, svc.Db, svc.Redis)
+	adminHandler := admin.New(svcCtx)
 
 	// 需要签名验证，无需登录验证，
 	login := mux.Group("/api")

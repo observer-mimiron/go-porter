@@ -51,8 +51,8 @@ func (h *handler) Create() httpx.HandlerFunc {
 		createData.Username = req.Username
 		createData.Mobile = req.Mobile
 		createData.Password = req.Password
-
-		id, err := h.adminService.Create(c, createData)
+		adminService := admin.New(h.svcCtx)
+		id, err := adminService.Create(c, createData)
 		if err != nil {
 			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,

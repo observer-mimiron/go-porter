@@ -1,14 +1,10 @@
 package admin
 
 import (
-	"go-porter/internal/app/service/admin"
-	"go-porter/pkg/core/pkg/cache/redis"
+	"go-porter/internal/svc"
 	"go-porter/pkg/core/pkg/conf"
-	"go-porter/pkg/core/pkg/database/mysql"
 	"go-porter/pkg/core/pkg/net/httpx"
 	"go-porter/pkg/cryptor/hash"
-
-	"go.uber.org/zap"
 )
 
 var _ Handler = (*handler)(nil)
@@ -71,18 +67,14 @@ type Handler interface {
 }
 
 type handler struct {
-	logger       *zap.Logger
-	cache        redis.Repo
-	hashids      hash.Hash
-	adminService admin.Service
+	svcCtx  *svc.ServiceContext
+	hashids hash.Hash
 }
 
-func New(logger *zap.Logger, db mysql.Repo, cache redis.Repo) Handler {
+func New(svcCtx *svc.ServiceContext) Handler {
 	return &handler{
-		logger:       logger,
-		cache:        cache,
-		hashids:      hash.New(conf.Get().HashIds.Secret, conf.Get().HashIds.Length),
-		adminService: admin.New(db, cache),
+		svcCtx:  svcCtx,
+		hashids: hash.New(conf.Get().HashIds.Secret, conf.Get().HashIds.Length),
 	}
 }
 

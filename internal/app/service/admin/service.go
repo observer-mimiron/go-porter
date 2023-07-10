@@ -2,8 +2,7 @@ package admin
 
 import (
 	"go-porter/internal/app/model"
-	"go-porter/pkg/core/pkg/cache/redis"
-	"go-porter/pkg/core/pkg/database/mysql"
+	"go-porter/internal/svc"
 	"go-porter/pkg/core/pkg/net/httpx"
 )
 
@@ -21,14 +20,12 @@ type Service interface {
 }
 
 type service struct {
-	db    mysql.Repo
-	cache redis.Repo
+	svc *svc.ServiceContext
 }
 
-func New(db mysql.Repo, cache redis.Repo) Service {
+func New(svc *svc.ServiceContext) Service {
 	return &service{
-		db:    db,
-		cache: cache,
+		svc: svc,
 	}
 }
 

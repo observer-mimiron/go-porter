@@ -46,7 +46,8 @@ func (h *handler) ModifyPersonalInfo() httpx.HandlerFunc {
 		modifyData.Nickname = req.Nickname
 		modifyData.Mobile = req.Mobile
 
-		if err := h.adminService.ModifyPersonalInfo(ctx, ctx.SessionUserInfo().UserID, modifyData); err != nil {
+		adminService := admin.New(h.svcCtx)
+		if err := adminService.ModifyPersonalInfo(ctx, ctx.SessionUserInfo().UserID, modifyData); err != nil {
 			ctx.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
 				code.AdminModifyPersonalInfoError,

@@ -23,7 +23,7 @@ func (s *service) Create(ctx httpx.Context, adminData *CreateAdminData) (id int3
 	admin.IsUsed = 1
 	admin.IsDeleted = -1
 
-	err = s.db.GetDbW().Create(admin).Error
+	err = s.svc.Db.GetDbW().Create(admin).Error
 	if err != nil {
 		return 0, err
 	}

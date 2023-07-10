@@ -54,7 +54,7 @@ func (h *handler) Offline() httpx.HandlerFunc {
 
 		id := int32(ids[0])
 
-		b := h.cache.Del(configs.RedisKeyPrefixLoginUser+password.GenerateLoginToken(id), redis.WithTrace(c.Trace()))
+		b := h.svcCtx.Redis.Del(configs.RedisKeyPrefixLoginUser+password.GenerateLoginToken(id), redis.WithTrace(c.Trace()))
 		if !b {
 			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
