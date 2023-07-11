@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"time"
 
-	"go-porter/internal/router"
+	"go-porter/internal/http/router"
 	"go-porter/pkg/core/pkg/shutdown"
 	"go.uber.org/zap"
 )

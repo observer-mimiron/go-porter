@@ -20,6 +20,7 @@ func NewServiceContext(c conf.Config) *ServiceContext {
 	if err != nil {
 		log.Fatal("new logger err", zap.Error(err))
 	}
+
 	mysqlClient, err := mysql.New(conf.Get().MySQL)
 	if err != nil {
 		log.Fatal("new mysql err", zap.Error(err))

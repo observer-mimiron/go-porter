@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"go-porter/internal/app/model"
+	"go-porter/internal/model"
 	"go-porter/pkg/core/pkg/net/httpx"
 )
 
@@ -15,7 +15,7 @@ type SearchOneData struct {
 }
 
 func (s *service) Detail(ctx httpx.Context, searchOneData *SearchOneData) (info *model.Admin, err error) {
-	qb := s.db.GetDbR().WithContext(ctx.RequestContext()).Model(&model.Admin{})
+	qb := s.svc.Db.GetDbR().WithContext(ctx.RequestContext()).Model(&model.Admin{})
 	qb.Where("is_deleted = ?", -1)
 
 	if searchOneData.Id != 0 {

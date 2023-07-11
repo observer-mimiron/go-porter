@@ -1,7 +1,7 @@
 package router
 
 import (
-	"go-porter/internal/app/api/admin"
+	"go-porter/internal/http/api/admin"
 	"go-porter/internal/svc"
 	"go-porter/pkg/core/pkg/net/httpx"
 )

@@ -4,9 +4,9 @@ import (
 	"go-porter/pkg/core/pkg/net/httpx"
 	"net/http"
 
-	"go-porter/internal/app/service/admin"
-	"go-porter/internal/code"
+	"go-porter/internal/http/code"
 	"go-porter/internal/pkg/password"
+	"go-porter/internal/service/admin"
 )
 
 type modifyPasswordRequest struct {

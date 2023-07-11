@@ -3,12 +3,11 @@ package Middleware
 import (
 	"encoding/json"
 	"go-porter/configs"
-	"go-porter/internal/app/service/admin"
 	"go-porter/pkg/core/pkg/database/mysql"
 	"go.uber.org/zap"
 	"net/http"
 
-	"go-porter/internal/code"
+	"go-porter/internal/http/code"
 	"go-porter/pkg/core/pkg/cache/redis"
 	"go-porter/pkg/core/pkg/errors"
 	"go-porter/pkg/core/pkg/net/httpx"
@@ -23,18 +22,16 @@ type Authenticate interface {
 }
 
 type authenticate struct {
-	logger       *zap.Logger
-	cache        redis.Repo
-	db           mysql.Repo
-	adminService admin.Service
+	logger *zap.Logger
+	cache  redis.Repo
+	db     mysql.Repo
 }
 
 func New(logger *zap.Logger, cache redis.Repo, db mysql.Repo) Authenticate {
 	return &authenticate{
-		logger:       logger,
-		cache:        cache,
-		db:           db,
-		adminService: admin.New(db, cache),
+		logger: logger,
+		cache:  cache,
+		db:     db,
 	}
 }
 

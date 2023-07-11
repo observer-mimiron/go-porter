@@ -1,38 +1,38 @@
 package admin
 
 import (
-	"go-porter/internal/app/service/admin"
+	"go-porter/configs"
 	"go-porter/pkg/core/pkg/net/httpx"
 	"net/http"
 
-	"go-porter/internal/code"
+	"go-porter/internal/http/code"
+	"go-porter/internal/pkg/password"
+	"go-porter/pkg/core/pkg/cache/redis"
 )
 
-type updateUsedRequest struct {
-	Id   string `form:"id"`   // 主键ID
-	Used int32  `form:"used"` // 是否启用 1:是 -1:否
+type offlineRequest struct {
+	Id string `form:"id"` // 主键ID
 }
 
-type updateUsedResponse struct {
+type offlineResponse struct {
 	Id int32 `json:"id"` // 主键ID
 }
 
-// UpdateUsed 更新管理员为启用/禁用
-// @Summary 更新管理员为启用/禁用
-// @Description 更新管理员为启用/禁用
+// Offline 下线管理员
+// @Summary 下线管理员
+// @Description 下线管理员
 // @Tags API.admin
 // @Accept application/x-www-form-urlencoded
 // @Produce json
 // @Param id formData string true "Hashid"
-// @Param used formData int true "是否启用 1:是 -1:否"
-// @Success 200 {object} updateUsedResponse
+// @Success 200 {object} offlineResponse
 // @Failure 400 {object} code.Failure
-// @Router /api/admin/used [patch]
+// @Router /api/admin/offline [patch]
 // @Security LoginToken
-func (h *handler) UpdateUsed() httpx.HandlerFunc {
+func (h *handler) Offline() httpx.HandlerFunc {
 	return func(c httpx.Context) {
-		req := new(updateUsedRequest)
-		res := new(updateUsedResponse)
+		req := new(offlineRequest)
+		res := new(offlineResponse)
 		if err := c.ShouldBindForm(req); err != nil {
 			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
@@ -53,13 +53,13 @@ func (h *handler) UpdateUsed() httpx.HandlerFunc {
 		}
 
 		id := int32(ids[0])
-		adminService := admin.New(h.svcCtx)
-		err = adminService.UpdateUsed(c, id, req.Used)
-		if err != nil {
+
+		b := h.svcCtx.Redis.Del(configs.RedisKeyPrefixLoginUser+password.GenerateLoginToken(id), redis.WithTrace(c.Trace()))
+		if !b {
 			c.AbortWithError(httpx.Error(
 				http.StatusBadRequest,
-				code.AdminUpdateError,
-				code.Text(code.AdminUpdateError)).WithError(err),
+				code.AdminOfflineError,
+				code.Text(code.AdminOfflineError)),
 			)
 			return
 		}

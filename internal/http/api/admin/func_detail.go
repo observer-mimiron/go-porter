@@ -4,8 +4,8 @@ import (
 	"go-porter/pkg/core/pkg/net/httpx"
 	"net/http"
 
-	"go-porter/internal/app/service/admin"
-	"go-porter/internal/code"
+	"go-porter/internal/http/code"
+	"go-porter/internal/service/admin"
 )
 
 type detailResponse struct {

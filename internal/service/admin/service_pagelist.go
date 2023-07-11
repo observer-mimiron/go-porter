@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"go-porter/internal/app/model"
+	"go-porter/internal/model"
 	"go-porter/pkg/core/pkg/net/httpx"
 )
 
@@ -26,7 +26,7 @@ func (s *service) PageList(ctx httpx.Context, searchData *SearchData) (listData 
 	}
 
 	offset := (page - 1) * pageSize
-	qb := s.db.GetDbR().WithContext(ctx.RequestContext()).Model(&model.Admin{})
+	qb := s.svc.Db.GetDbR().WithContext(ctx.RequestContext()).Model(&model.Admin{})
 	if searchData.Username != "" {
 		qb.Where("username like ?", "%"+searchData.Username+"%")
 	}

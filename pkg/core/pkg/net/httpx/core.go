@@ -3,7 +3,7 @@ package httpx
 import (
 	"fmt"
 	"go-porter/configs"
-	"go-porter/internal/code"
+	"go-porter/internal/http/code"
 	"go-porter/pkg/core/pkg/conf/env"
 	"go-porter/pkg/core/pkg/errors"
 	"go-porter/pkg/core/pkg/proposal"
@@ -222,8 +222,6 @@ func New(logger *zap.Logger, options ...Option) (Mux, error) {
 		engine: gin.New(),
 	}
 
-	fmt.Println("启动成功")
-
 	// withoutTracePaths 这些请求，默认不记录日志
 	withoutTracePaths := map[string]bool{
 		"/metrics": true,
@@ -289,7 +287,6 @@ func New(logger *zap.Logger, options ...Option) (Mux, error) {
 	})
 
 	mux.engine.Use(func(ctx *gin.Context) {
-
 		if ctx.Writer.Status() == http.StatusNotFound {
 			return
 		}

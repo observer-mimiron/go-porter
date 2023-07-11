@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"go-porter/internal/app/model"
+	"go-porter/internal/model"
 	"go-porter/internal/pkg/password"
 	"go-porter/pkg/core/pkg/net/httpx"
 )
