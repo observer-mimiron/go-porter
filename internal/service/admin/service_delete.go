@@ -3,7 +3,7 @@ package admin
 import (
 	"go-porter/configs"
 	"go-porter/internal/model"
-	"go-porter/internal/pkg/password"
+	"go-porter/internal/util/password"
 	"go-porter/pkg/core/pkg/cache/redis"
 	"go-porter/pkg/core/pkg/net/httpx"
 )

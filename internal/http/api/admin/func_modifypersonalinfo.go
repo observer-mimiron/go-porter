@@ -1,11 +1,10 @@
 package admin
 
 import (
-	"go-porter/pkg/core/pkg/net/httpx"
-	"net/http"
-
-	"go-porter/internal/http/code"
+	"github.com/pkg/errors"
+	"go-porter/internal/ecode"
 	"go-porter/internal/service/admin"
+	"go-porter/pkg/core/pkg/net/httpx"
 )
 
 type modifyPersonalInfoRequest struct {
@@ -26,19 +25,15 @@ type modifyPersonalInfoResponse struct {
 // @Param nickname formData string true "昵称"
 // @Param mobile formData string true "手机号"
 // @Success 200 {object} modifyPersonalInfoResponse
-// @Failure 400 {object} code.Failure
+// @Failure 400 {object} ecode.Failure
 // @Router /api/admin/modify_personal_info [patch]
 // @Security LoginToken
 func (h *handler) ModifyPersonalInfo() httpx.HandlerFunc {
-	return func(ctx httpx.Context) {
+	return func(c httpx.Context) {
 		req := new(modifyPersonalInfoRequest)
 		res := new(modifyPersonalInfoResponse)
-		if err := ctx.ShouldBindForm(req); err != nil {
-			ctx.AbortWithError(httpx.Error(
-				http.StatusBadRequest,
-				code.ParamBindError,
-				code.Text(code.ParamBindError)).WithError(err),
-			)
+		if err := c.ShouldBindForm(req); err != nil {
+			c.AbortWithError(errors.Wrapf(ecode.ErrParamBind, "ModifyPersonalInfo error %+v", err))
 			return
 		}
 
@@ -47,16 +42,12 @@ func (h *handler) ModifyPersonalInfo() httpx.HandlerFunc {
 		modifyData.Mobile = req.Mobile
 
 		adminService := admin.New(h.svcCtx)
-		if err := adminService.ModifyPersonalInfo(ctx, ctx.SessionUserInfo().UserID, modifyData); err != nil {
-			ctx.AbortWithError(httpx.Error(
-				http.StatusBadRequest,
-				code.AdminModifyPersonalInfoError,
-				code.Text(code.AdminModifyPersonalInfoError)).WithError(err),
-			)
+		if err := adminService.ModifyPersonalInfo(c, c.SessionUserInfo().UserID, modifyData); err != nil {
+			c.AbortWithError(errors.Wrapf(ecode.ErrParamBind, "ModifyPersonalInfo error %+v", err))
 			return
 		}
 
-		res.Username = ctx.SessionUserInfo().UserName
-		ctx.Payload(res)
+		res.Username = c.SessionUserInfo().UserName
+		c.Payload(res)
 	}
 }

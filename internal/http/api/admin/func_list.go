@@ -1,13 +1,12 @@
 package admin
 
 import (
+	"github.com/pkg/errors"
 	"go-porter/configs"
-	"go-porter/pkg/core/pkg/net/httpx"
-	"net/http"
-
-	"go-porter/internal/http/code"
-	"go-porter/internal/pkg/password"
+	"go-porter/internal/ecode"
 	"go-porter/internal/service/admin"
+	"go-porter/internal/util/password"
+	"go-porter/pkg/core/pkg/net/httpx"
 	"go-porter/pkg/timeutil"
 
 	"github.com/spf13/cast"
@@ -56,7 +55,7 @@ type listResponse struct {
 // @Param nickname query string false "昵称"
 // @Param mobile query string false "手机号"
 // @Success 200 {object} listResponse
-// @Failure 400 {object} code.Failure
+// @Failure 400 {object} ecode.Failure
 // @Router /api/admin [get]
 // @Security LoginToken
 func (h *handler) List() httpx.HandlerFunc {
@@ -64,11 +63,7 @@ func (h *handler) List() httpx.HandlerFunc {
 		req := new(listRequest)
 		res := new(listResponse)
 		if err := c.ShouldBindForm(req); err != nil {
-			c.AbortWithError(httpx.Error(
-				http.StatusBadRequest,
-				code.ParamBindError,
-				code.Text(code.ParamBindError)).WithError(err),
-			)
+			c.AbortWithError(errors.Wrapf(ecode.ErrParamBind, "c.ShouldBindForm error: %s", err))
 			return
 		}
 
@@ -92,11 +87,7 @@ func (h *handler) List() httpx.HandlerFunc {
 		adminService := admin.New(h.svcCtx)
 		resListData, resCountData, err := adminService.PageList(c, searchData)
 		if err != nil {
-			c.AbortWithError(httpx.Error(
-				http.StatusBadRequest,
-				code.AdminListError,
-				code.Text(code.AdminListError)).WithError(err),
-			)
+			c.AbortWithError(errors.Wrapf(ecode.ErrAdminList, "adminService.PageList error: %s", err))
 			return
 		}
 
@@ -108,11 +99,7 @@ func (h *handler) List() httpx.HandlerFunc {
 		for k, v := range resListData {
 			hashId, err := h.hashids.HashidsEncode([]int{cast.ToInt(v.Id)})
 			if err != nil {
-				c.AbortWithError(httpx.Error(
-					http.StatusBadRequest,
-					code.HashIdsEncodeError,
-					code.Text(code.HashIdsEncodeError)).WithError(err),
-				)
+				c.AbortWithError(errors.Wrap(ecode.ErrHashIdsDxerror, err.Error()))
 				return
 			}
 

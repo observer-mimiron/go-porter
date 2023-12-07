@@ -1,15 +1,13 @@
 package admin
 
 import (
+	"github.com/pkg/errors"
 	"go-porter/configs"
-	"go-porter/pkg/core/pkg/net/httpx"
-	"net/http"
-
-	"go-porter/internal/http/code"
-	"go-porter/internal/pkg/password"
+	"go-porter/internal/ecode"
 	"go-porter/internal/service/admin"
+	"go-porter/internal/util/password"
 	"go-porter/pkg/core/pkg/cache/redis"
-	"go-porter/pkg/core/pkg/errors"
+	"go-porter/pkg/core/pkg/net/httpx"
 	"go-porter/pkg/core/pkg/proposal"
 )
 
@@ -31,7 +29,7 @@ type loginResponse struct {
 // @Param username formData string true "用户名"
 // @Param password formData string true "MD5后的密码"
 // @Success 200 {object} loginResponse
-// @Failure 400 {object} code.Failure
+// @Failure 400 {object} ecode.Failure
 // @Router /api/login [post]
 // @Security LoginToken
 func (h *handler) Login() httpx.HandlerFunc {
@@ -39,11 +37,7 @@ func (h *handler) Login() httpx.HandlerFunc {
 		req := new(loginRequest)
 		res := new(loginResponse)
 		if err := c.ShouldBindForm(req); err != nil {
-			c.AbortWithError(httpx.Error(
-				http.StatusBadRequest,
-				code.ParamBindError,
-				code.Text(code.ParamBindError)).WithError(err),
-			)
+			c.AbortWithError(errors.Wrapf(ecode.ErrParamBind, "Create error %+v", err))
 			return
 		}
 
@@ -55,20 +49,12 @@ func (h *handler) Login() httpx.HandlerFunc {
 		adminService := admin.New(h.svcCtx)
 		info, err := adminService.Detail(c, searchOneData)
 		if err != nil {
-			c.AbortWithError(httpx.Error(
-				http.StatusBadRequest,
-				code.AdminLoginError,
-				code.Text(code.AdminLoginError)).WithError(err),
-			)
+			c.AbortWithError(errors.WithMessage(err, "Login error"))
 			return
 		}
 
 		if info == nil {
-			c.AbortWithError(httpx.Error(
-				http.StatusBadRequest,
-				code.AdminLoginError,
-				code.Text(code.AdminLoginError)).WithError(errors.New("未查询出符合条件的用户")),
-			)
+			c.AbortWithError(errors.Wrapf(ecode.ErrUserNotFound, "Login error %+v", searchOneData))
 			return
 		}
 
@@ -83,11 +69,7 @@ func (h *handler) Login() httpx.HandlerFunc {
 		// 将用户信息记录到 Redis 中
 		err = h.svcCtx.Redis.Set(configs.RedisKeyPrefixLoginUser+token, string(sessionUserInfo.Marshal()), configs.LoginSessionTTL, redis.WithTrace(c.Trace()))
 		if err != nil {
-			c.AbortWithError(httpx.Error(
-				http.StatusBadRequest,
-				code.AdminLoginError,
-				code.Text(code.AdminLoginError)).WithError(err),
-			)
+			c.AbortWithError(errors.Wrapf(ecode.ErrAdminLogin, "Login error %+v", err))
 			return
 		}
 

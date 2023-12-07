@@ -1,6 +1,8 @@
 package admin
 
 import (
+	"github.com/pkg/errors"
+	"go-porter/internal/ecode"
 	"go-porter/internal/model"
 	"go-porter/pkg/core/pkg/net/httpx"
 )
@@ -44,7 +46,7 @@ func (s *service) Detail(ctx httpx.Context, searchOneData *SearchOneData) (info 
 
 	err = qb.First(&info).Error
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(ecode.ErrAdminDetail, "查询管理员详情失败: %v", err)
 	}
 
 	return

@@ -2,12 +2,13 @@ package httpx
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"go-porter/configs"
-	"go-porter/internal/http/code"
+	"go-porter/internal/ecode"
 	"go-porter/pkg/core/pkg/conf/env"
-	"go-porter/pkg/core/pkg/errors"
 	"go-porter/pkg/core/pkg/proposal"
 	"go-porter/pkg/core/pkg/trace"
+	"go-porter/pkg/core/pkg/xerror"
 	"net/http"
 	"net/url"
 	"runtime/debug"
@@ -102,7 +103,7 @@ func AliasForRecordMetrics(path string) HandlerFunc {
 }
 
 // WrapAuthHandler 用来处理 Auth 的入口
-func WrapAuthHandler(handler func(Context) (sessionUserInfo proposal.SessionUserInfo, err BusinessError)) HandlerFunc {
+func WrapAuthHandler(handler func(Context) (sessionUserInfo proposal.SessionUserInfo, err *xerror.ErrCode)) HandlerFunc {
 	return func(ctx Context) {
 		sessionUserInfo, err := handler(ctx)
 		if err != nil {
@@ -214,7 +215,7 @@ func (m *mux) Group(relativePath string, handlers ...HandlerFunc) RouterGroup {
 
 func New(logger *zap.Logger, options ...Option) (Mux, error) {
 	if logger == nil {
-		return nil, errors.New("logger required")
+		return nil, errors.New("logger is nil")
 	}
 
 	gin.SetMode(gin.ReleaseMode)
@@ -325,12 +326,13 @@ func New(logger *zap.Logger, options ...Option) (Mux, error) {
 			// region 发生 Panic 异常发送告警提醒
 			if err := recover(); err != nil {
 				stackInfo := string(debug.Stack())
-				logger.Error("got panic", zap.String("panic", fmt.Sprintf("%+v", err)), zap.String("stack", stackInfo))
-				context.AbortWithError(Error(
-					http.StatusInternalServerError,
-					code.ServerError,
-					code.Text(code.ServerError)),
+
+				logger.Error("got panic",
+					zap.String("panic", fmt.Sprintf("%+v", err)),
+					zap.String("stack", stackInfo),
 				)
+
+				context.AbortWithError(ecode.ErrServer)
 
 				if notifyHandler := opt.alertNotify; notifyHandler != nil {
 					notifyHandler(&proposal.AlertMessage{
@@ -346,9 +348,9 @@ func New(logger *zap.Logger, options ...Option) (Mux, error) {
 					})
 				}
 			}
-			// endregion
 
-			// region 发生错误，进行返回
+			// endregion
+			// region 发生错误，进行返回 错误处理
 			if ctx.IsAborted() {
 				for i := range ctx.Errors {
 					multierr.AppendInto(&abortErr, ctx.Errors[i])
@@ -356,31 +358,49 @@ func New(logger *zap.Logger, options ...Option) (Mux, error) {
 
 				if err := context.abortError(); err != nil { // customer err
 					// 判断是否需要发送告警通知
-					if err.IsAlert() {
-						if notifyHandler := opt.alertNotify; notifyHandler != nil {
-							notifyHandler(&proposal.AlertMessage{
-								ProjectName:  configs.ProjectName,
-								Env:          env.Active().Value(),
-								TraceID:      traceId,
-								HOST:         context.Host(),
-								URI:          context.URI(),
-								Method:       context.Method(),
-								ErrorMessage: err.Message(),
-								ErrorStack:   fmt.Sprintf("%+v", err.StackError()),
-								Timestamp:    time.Now(),
-							})
-						}
+					//if err.IsAlert() {
+					//	if notifyHandler := opt.alertNotify; notifyHandler != nil {
+					//		notifyHandler(&proposal.AlertMessage{
+					//			ProjectName:  configs.ProjectName,
+					//			Env:          env.Active().Value(),
+					//			TraceID:      traceId,
+					//			HOST:         context.Host(),
+					//			URI:          context.URI(),
+					//			Method:       context.Method(),
+					//			ErrorMessage: err.Message(),
+					//			ErrorStack:   fmt.Sprintf("%+v", err.StackError()),
+					//			Timestamp:    time.Now(),
+					//		})
+					//	}
+					//}
+
+					errcode := ecode.ErrServer.Code()
+					errmsg := ecode.ErrServer.Message()
+					causeErr := errors.Cause(err)
+					multierr.AppendInto(&abortErr, errors.WithStack(causeErr))
+
+					if e, ok := causeErr.(*xerror.ErrCode); ok { //自定义错误类型
+						errcode = e.Code()
+						errmsg = e.Message()
+						multierr.AppendInto(&abortErr, errors.WithStack(err))
+					}
+					stackInfo := string(debug.Stack())
+					logger.Error("got error",
+						zap.String("error", fmt.Sprintf("%+v", causeErr)),
+						zap.String("stack", fmt.Sprintf("%+v", stackInfo)),
+					)
+
+					type Code struct {
+						Code    int    `json:"code"`    // 业务码
+						Message string `json:"message"` // 描述信息
 					}
 
-					multierr.AppendInto(&abortErr, err.StackError())
-					businessCode = err.BusinessCode()
-					businessCodeMsg = err.Message()
-					response = &code.Failure{
-						Code:    businessCode,
-						Message: businessCodeMsg,
-					}
-					ctx.JSON(err.HTTPCode(), response)
+					ctx.JSON(http.StatusUnauthorized, &Code{
+						Code:    errcode,
+						Message: errmsg,
+					})
 				}
+
 			}
 			// endregion
 
@@ -483,11 +503,12 @@ func New(logger *zap.Logger, options ...Option) (Mux, error) {
 			defer releaseContext(context)
 
 			if !limiter.Allow() {
-				context.AbortWithError(Error(
-					http.StatusTooManyRequests,
-					code.TooManyRequests,
-					code.Text(code.TooManyRequests)),
-				)
+				context.AbortWithError(ecode.ErrTooManyRequests)
+				//context.AbortWithError(errors.Error(
+				//	http.StatusTooManyRequests,
+				//	ecode.TooManyRequests,
+				//	ecode.Text(ecode.TooManyRequests)),
+				//)
 				return
 			}
 

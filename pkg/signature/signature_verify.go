@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"go-porter/pkg/core/pkg/errors"
+	"github.com/pkg/errors"
 	"go-porter/pkg/timeutil"
 )
 

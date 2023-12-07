@@ -1,12 +1,11 @@
 package admin
 
 import (
-	"go-porter/pkg/core/pkg/net/httpx"
-	"net/http"
-
-	"go-porter/internal/http/code"
-	"go-porter/internal/pkg/password"
+	"github.com/pkg/errors"
+	"go-porter/internal/ecode"
 	"go-porter/internal/service/admin"
+	"go-porter/internal/util/password"
+	"go-porter/pkg/core/pkg/net/httpx"
 )
 
 type modifyPasswordRequest struct {
@@ -27,7 +26,7 @@ type modifyPasswordResponse struct {
 // @Param old_password formData string true "旧密码"
 // @Param new_password formData string true "新密码"
 // @Success 200 {object} modifyPasswordResponse
-// @Failure 400 {object} code.Failure
+// @Failure 400 {object} ecode.Failure
 // @Router /api/admin/modify_password [patch]
 // @Security LoginToken
 func (h *handler) ModifyPassword() httpx.HandlerFunc {
@@ -35,11 +34,7 @@ func (h *handler) ModifyPassword() httpx.HandlerFunc {
 		req := new(modifyPasswordRequest)
 		res := new(modifyPasswordResponse)
 		if err := ctx.ShouldBindForm(req); err != nil {
-			ctx.AbortWithError(httpx.Error(
-				http.StatusBadRequest,
-				code.ParamBindError,
-				code.Text(code.ParamBindError)).WithError(err),
-			)
+			ctx.AbortWithError(errors.Wrapf(ecode.ErrParamBind, "ModifyPassword error %+v", err))
 			return
 		}
 
@@ -51,20 +46,12 @@ func (h *handler) ModifyPassword() httpx.HandlerFunc {
 		adminService := admin.New(h.svcCtx)
 		info, err := adminService.Detail(ctx, searchOneData)
 		if err != nil || info == nil {
-			ctx.AbortWithError(httpx.Error(
-				http.StatusBadRequest,
-				code.AdminModifyPasswordError,
-				code.Text(code.AdminModifyPasswordError)).WithError(err),
-			)
+			ctx.AbortWithError(err)
 			return
 		}
 
 		if err := adminService.ModifyPassword(ctx, ctx.SessionUserInfo().UserID, req.NewPassword); err != nil {
-			ctx.AbortWithError(httpx.Error(
-				http.StatusBadRequest,
-				code.AdminModifyPasswordError,
-				code.Text(code.AdminModifyPasswordError)).WithError(err),
-			)
+			ctx.AbortWithError(errors.Wrapf(ecode.ErrAdminModifyPassword, "ModifyPassword error %+v", err))
 			return
 		}
 

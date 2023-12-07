@@ -1,8 +1,10 @@
 package admin
 
 import (
+	"github.com/pkg/errors"
+	"go-porter/internal/ecode"
 	"go-porter/internal/model"
-	"go-porter/internal/pkg/password"
+	"go-porter/internal/util/password"
 	"go-porter/pkg/core/pkg/net/httpx"
 )
 
@@ -25,7 +27,7 @@ func (s *service) Create(ctx httpx.Context, adminData *CreateAdminData) (id int3
 
 	err = s.svc.Db.GetDbW().Create(admin).Error
 	if err != nil {
-		return 0, err
+		return 0, errors.Wrapf(ecode.ErrAdminCreate, "创建管理员失败: %v", err)
 	}
 	return admin.Id, nil
 }

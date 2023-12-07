@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm/schema"
 	"time"
 
-	"go-porter/pkg/core/pkg/errors"
+	"github.com/pkg/errors"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

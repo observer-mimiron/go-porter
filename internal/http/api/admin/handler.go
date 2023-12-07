@@ -77,5 +77,3 @@ func New(svcCtx *svc.ServiceContext) Handler {
 		hashids: hash.New(conf.Get().HashIds.Secret, conf.Get().HashIds.Length),
 	}
 }
-
-func (h *handler) i() {}

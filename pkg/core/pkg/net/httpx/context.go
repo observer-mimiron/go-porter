@@ -83,8 +83,8 @@ type Context interface {
 	Payload(payload interface{})
 	getPayload() interface{}
 	// AbortWithError 错误返回
-	AbortWithError(err BusinessError)
-	abortError() BusinessError
+	AbortWithError(err error)
+	abortError() error
 	// Header 获取 Header 对象
 	Header() http.Header
 	// GetHeader 获取 Header
@@ -254,21 +254,17 @@ func (c *context) setSessionUserInfo(info proposal.SessionUserInfo) {
 	c.ctx.Set(_SessionUserInfo, info)
 }
 
-func (c *context) AbortWithError(err BusinessError) {
+func (c *context) AbortWithError(err error) {
 	if err != nil {
-		httpCode := err.HTTPCode()
-		if httpCode == 0 {
-			httpCode = http.StatusInternalServerError
-		}
-
+		httpCode := http.StatusInternalServerError
 		c.ctx.AbortWithStatus(httpCode)
 		c.ctx.Set(_AbortErrorName, err)
 	}
 }
 
-func (c *context) abortError() BusinessError {
+func (c *context) abortError() error {
 	err, _ := c.ctx.Get(_AbortErrorName)
-	return err.(BusinessError)
+	return err.(error)
 }
 
 func (c *context) Alias() string {

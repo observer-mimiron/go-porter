@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"go-porter/pkg/core/pkg/errors"
+	"github.com/pkg/errors"
 	"go-porter/pkg/core/pkg/trace"
 	"go-porter/pkg/timeutil"
 

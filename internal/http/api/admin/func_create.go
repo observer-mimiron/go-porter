@@ -1,11 +1,10 @@
 package admin
 
 import (
-	"go-porter/internal/http/code"
-	"go-porter/internal/pkg/validation"
+	"github.com/pkg/errors"
+	"go-porter/internal/ecode"
 	"go-porter/internal/service/admin"
 	"go-porter/pkg/core/pkg/net/httpx"
-	"net/http"
 )
 
 type createRequest struct {
@@ -30,7 +29,7 @@ type createResponse struct {
 // @Param mobile formData string true "手机号"
 // @Param password formData string true "MD5后的密码"
 // @Success 200 {object} createResponse
-// @Failure 400 {object} code.Failure
+// @Failure 400 {object} ecode.Failure
 // @Router /api/admin [post]
 // @Security LoginToken
 func (h *handler) Create() httpx.HandlerFunc {
@@ -38,11 +37,7 @@ func (h *handler) Create() httpx.HandlerFunc {
 		req := new(createRequest)
 		res := new(createResponse)
 		if err := c.ShouldBindForm(req); err != nil {
-			c.AbortWithError(httpx.Error(
-				http.StatusBadRequest,
-				code.ParamBindError,
-				validation.Error(err)).WithError(err),
-			)
+			c.AbortWithError(errors.Wrapf(ecode.ErrParamBind, "Create error %+v", err))
 			return
 		}
 
@@ -54,11 +49,7 @@ func (h *handler) Create() httpx.HandlerFunc {
 		adminService := admin.New(h.svcCtx)
 		id, err := adminService.Create(c, createData)
 		if err != nil {
-			c.AbortWithError(httpx.Error(
-				http.StatusBadRequest,
-				code.AdminCreateError,
-				code.Text(code.AdminCreateError)).WithError(err),
-			)
+			c.AbortWithError(errors.WithMessage(err, "Create error"))
 			return
 		}
 

@@ -1,13 +1,11 @@
 package admin
 
 import (
+	"github.com/pkg/errors"
 	"go-porter/configs"
-	"go-porter/pkg/core/pkg/net/httpx"
-	"net/http"
-
-	"go-porter/internal/http/code"
+	"go-porter/internal/ecode"
 	"go-porter/pkg/core/pkg/cache/redis"
-	"go-porter/pkg/core/pkg/errors"
+	"go-porter/pkg/core/pkg/net/httpx"
 )
 
 type logoutResponse struct {
@@ -21,7 +19,7 @@ type logoutResponse struct {
 // @Accept application/x-www-form-urlencoded
 // @Produce json
 // @Success 200 {object} logoutResponse
-// @Failure 400 {object} code.Failure
+// @Failure 400 {object} ecode.Failure
 // @Router /api/admin/logout [post]
 // @Security LoginToken
 func (h *handler) Logout() httpx.HandlerFunc {
@@ -30,11 +28,7 @@ func (h *handler) Logout() httpx.HandlerFunc {
 		res.Username = c.SessionUserInfo().UserName
 
 		if !h.svcCtx.Redis.Del(configs.RedisKeyPrefixLoginUser+c.GetHeader(configs.HeaderLoginToken), redis.WithTrace(c.Trace())) {
-			c.AbortWithError(httpx.Error(
-				http.StatusBadRequest,
-				code.AdminLogOutError,
-				code.Text(code.AdminLogOutError)).WithError(errors.New("cache del err")),
-			)
+			c.AbortWithError(errors.Wrap(ecode.ErrAdminLogOut, "Logout error"))
 			return
 		}
 

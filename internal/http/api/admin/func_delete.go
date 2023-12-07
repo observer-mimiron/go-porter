@@ -1,11 +1,10 @@
 package admin
 
 import (
+	"github.com/pkg/errors"
+	"go-porter/internal/ecode"
 	"go-porter/internal/service/admin"
 	"go-porter/pkg/core/pkg/net/httpx"
-	"net/http"
-
-	"go-porter/internal/http/code"
 )
 
 type deleteRequest struct {
@@ -24,7 +23,7 @@ type deleteResponse struct {
 // @Produce json
 // @Param id path string true "hashId"
 // @Success 200 {object} deleteResponse
-// @Failure 400 {object} code.Failure
+// @Failure 400 {object} ecode.Failure
 // @Router /api/admin/{id} [delete]
 // @Security LoginToken
 func (h *handler) Delete() httpx.HandlerFunc {
@@ -32,21 +31,13 @@ func (h *handler) Delete() httpx.HandlerFunc {
 		req := new(deleteRequest)
 		res := new(deleteResponse)
 		if err := c.ShouldBindURI(req); err != nil {
-			c.AbortWithError(httpx.Error(
-				http.StatusBadRequest,
-				code.ParamBindError,
-				code.Text(code.ParamBindError)).WithError(err),
-			)
+			c.AbortWithError(errors.Wrapf(ecode.ErrParamBind, "Delete error %+v", err))
 			return
 		}
 
 		ids, err := h.hashids.HashidsDecode(req.Id)
 		if err != nil {
-			c.AbortWithError(httpx.Error(
-				http.StatusBadRequest,
-				code.HashIdsDecodeError,
-				code.Text(code.HashIdsDecodeError)).WithError(err),
-			)
+			c.AbortWithError(errors.Wrapf(ecode.ErrHashIdsDxerror, "Delete  error %+v", err))
 			return
 		}
 
@@ -54,11 +45,7 @@ func (h *handler) Delete() httpx.HandlerFunc {
 		adminService := admin.New(h.svcCtx)
 		err = adminService.Delete(c, id)
 		if err != nil {
-			c.AbortWithError(httpx.Error(
-				http.StatusBadRequest,
-				code.AdminDeleteError,
-				code.Text(code.AdminDeleteError)).WithError(err),
-			)
+			c.AbortWithError(errors.Wrapf(ecode.ErrHashIdsDxerror, "Delete  error %+v", err))
 			return
 		}
 
