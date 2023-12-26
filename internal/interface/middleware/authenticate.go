@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/pkg/errors"
 	"go-porter/configs"
-	"go-porter/internal/ecode"
+	"go-porter/internal/errCode"
 	"go-porter/pkg/core/pkg/cache/redis"
 	"go-porter/pkg/core/pkg/database/mysql"
 	"go-porter/pkg/core/pkg/net/httpx"
@@ -42,7 +42,7 @@ func (i *authenticate) CheckLogin(ctx httpx.Context) (sessionUserInfo proposal.S
 		//	http.StatusUnauthorized,
 		//	ecode.ErrAuthorizationError,
 		//	ecode.Text(ecode.ErrAuthorizationError)).WithError(errors.New("Header 中缺少 Token 参数"))
-		ctx.AbortWithError(errors.Wrap(ecode.ErrAuthorization, "Header 中缺少 Token 参数"))
+		ctx.AbortWithError(errors.Wrap(errCode.ErrAuthorization, "Header 中缺少 Token 参数"))
 		return
 	}
 
@@ -51,7 +51,7 @@ func (i *authenticate) CheckLogin(ctx httpx.Context) (sessionUserInfo proposal.S
 		//	http.StatusUnauthorized,
 		//	ecode.ErrAuthorizationError,
 		//	ecode.Text(ecode.ErrAuthorizationError)).WithError(errors.New("请先登录"))
-		ctx.AbortWithError(errors.Wrap(ecode.ErrAuthorization, "请先登录"))
+		ctx.AbortWithError(errors.Wrap(errCode.ErrAuthorization, "请先登录"))
 		return
 	}
 
@@ -61,7 +61,7 @@ func (i *authenticate) CheckLogin(ctx httpx.Context) (sessionUserInfo proposal.S
 		//	http.StatusUnauthorized,
 		//	ecode.ErrAuthorizationError,
 		//	ecode.Text(ecode.ErrAuthorizationError)).WithError(cacheErr)
-		ctx.AbortWithError(errors.Wrapf(ecode.ErrAuthorization, "请先登录"))
+		ctx.AbortWithError(errors.Wrapf(errCode.ErrAuthorization, "请先登录"))
 		return
 	}
 
@@ -71,7 +71,7 @@ func (i *authenticate) CheckLogin(ctx httpx.Context) (sessionUserInfo proposal.S
 		//	http.StatusUnauthorized,
 		//	ecode.ErrAuthorizationError,
 		//	ecode.Text(ecode.ErrAuthorizationError)).WithError(jsonErr)
-		ctx.AbortWithError(errors.Wrapf(ecode.ErrAuthorization, "请先登录"))
+		ctx.AbortWithError(errors.Wrapf(errCode.ErrAuthorization, "请先登录"))
 		return
 	}
 

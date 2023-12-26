@@ -1,7 +1,7 @@
 package router
 
 import (
-	"go-porter/internal/http/api/admin"
+	"go-porter/internal/interface/handler/admin"
 	"go-porter/internal/svc"
 	"go-porter/pkg/core/pkg/net/httpx"
 )
@@ -26,7 +26,7 @@ func SetApiRouter(svcCtx *svc.ServiceContext, mux httpx.Mux) {
 	{
 		notRBAC.POST("/admin/logout", adminHandler.Logout())
 		notRBAC.PATCH("/admin/modify_password", adminHandler.ModifyPassword())
-		notRBAC.GET("/admin/info", adminHandler.Detail())
+		notRBAC.GET("/admin/detail", adminHandler.Detail())
 		notRBAC.PATCH("/admin/modify_personal_info", adminHandler.ModifyPersonalInfo())
 	}
 }

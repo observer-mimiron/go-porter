@@ -2,7 +2,7 @@ package admin
 
 import (
 	"github.com/pkg/errors"
-	"go-porter/internal/ecode"
+	"go-porter/internal/errCode"
 	"go-porter/internal/service/admin"
 	"go-porter/pkg/core/pkg/net/httpx"
 )
@@ -26,20 +26,20 @@ type updateUsedResponse struct {
 // @Param used formData int true "是否启用 1:是 -1:否"
 // @Success 200 {object} updateUsedResponse
 // @Failure 400 {object} ecode.Failure
-// @Router /api/admin/used [patch]
+// @Router /hanlder/admin/used [patch]
 // @Security LoginToken
 func (h *handler) UpdateUsed() httpx.HandlerFunc {
 	return func(c httpx.Context) {
 		req := new(updateUsedRequest)
 		res := new(updateUsedResponse)
 		if err := c.ShouldBindForm(req); err != nil {
-			c.AbortWithError(errors.Wrapf(ecode.ErrParamBind, "UpdateUsed error %+v", err))
+			c.AbortWithError(errors.Wrapf(errCode.ErrParamBind, "UpdateUsed error %+v", err))
 			return
 		}
 
 		ids, err := h.hashids.HashidsDecode(req.Id)
 		if err != nil {
-			c.AbortWithError(errors.Wrapf(ecode.ErrHashIdsDxerror, "UpdateUsed error %+v", err))
+			c.AbortWithError(errors.Wrapf(errCode.ErrServer, "UpdateUsed error %+v", err))
 			return
 		}
 
@@ -47,7 +47,7 @@ func (h *handler) UpdateUsed() httpx.HandlerFunc {
 		adminService := admin.New(h.svcCtx)
 		err = adminService.UpdateUsed(c, id, req.Used)
 		if err != nil {
-			c.AbortWithError(errors.Wrapf(ecode.ErrAdminUpdate, "UpdateUsed error %+v", err))
+			c.AbortWithError(errors.Wrapf(errCode.ErrServer, "UpdateUsed error %+v", err))
 			return
 		}
 

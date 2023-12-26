@@ -2,7 +2,7 @@ package admin
 
 import (
 	"github.com/pkg/errors"
-	"go-porter/internal/ecode"
+	"go-porter/internal/errCode"
 	"go-porter/internal/service/admin"
 	"go-porter/pkg/core/pkg/net/httpx"
 )
@@ -26,14 +26,14 @@ type modifyPersonalInfoResponse struct {
 // @Param mobile formData string true "手机号"
 // @Success 200 {object} modifyPersonalInfoResponse
 // @Failure 400 {object} ecode.Failure
-// @Router /api/admin/modify_personal_info [patch]
+// @Router /hanlder/admin/modify_personal_info [patch]
 // @Security LoginToken
 func (h *handler) ModifyPersonalInfo() httpx.HandlerFunc {
 	return func(c httpx.Context) {
 		req := new(modifyPersonalInfoRequest)
 		res := new(modifyPersonalInfoResponse)
 		if err := c.ShouldBindForm(req); err != nil {
-			c.AbortWithError(errors.Wrapf(ecode.ErrParamBind, "ModifyPersonalInfo error %+v", err))
+			c.AbortWithError(errors.Wrapf(errCode.ErrParamBind, "ModifyPersonalInfo error %+v", err))
 			return
 		}
 
@@ -43,7 +43,7 @@ func (h *handler) ModifyPersonalInfo() httpx.HandlerFunc {
 
 		adminService := admin.New(h.svcCtx)
 		if err := adminService.ModifyPersonalInfo(c, c.SessionUserInfo().UserID, modifyData); err != nil {
-			c.AbortWithError(errors.Wrapf(ecode.ErrParamBind, "ModifyPersonalInfo error %+v", err))
+			c.AbortWithError(errors.Wrapf(errCode.ErrParamBind, "ModifyPersonalInfo error %+v", err))
 			return
 		}
 

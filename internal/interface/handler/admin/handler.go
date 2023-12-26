@@ -12,57 +12,57 @@ var _ Handler = (*handler)(nil)
 type Handler interface {
 	// Login 管理员登录
 	// @Tags API.admin
-	// @Router /api/login [post]
+	// @Router /hanlder/login [post]
 	Login() httpx.HandlerFunc
 
 	// Logout 管理员登出
 	// @Tags API.admin
-	// @Router /api/admin/logout [post]
+	// @Router /hanlder/admin/logout [post]
 	Logout() httpx.HandlerFunc
 
 	// ModifyPassword 修改密码
 	// @Tags API.admin
-	// @Router /api/admin/modify_password [patch]
+	// @Router /hanlder/admin/modify_password [patch]
 	ModifyPassword() httpx.HandlerFunc
 
 	// Detail 个人信息
 	// @Tags API.admin
-	// @Router /api/admin/info [get]
+	// @Router /hanlder/admin/info [get]
 	Detail() httpx.HandlerFunc
 
 	// ModifyPersonalInfo 修改个人信息
 	// @Tags API.admin
-	// @Router /api/admin/modify_personal_info [patch]
+	// @Router /hanlder/admin/modify_personal_info [patch]
 	ModifyPersonalInfo() httpx.HandlerFunc
 
 	// Create 新增管理员
 	// @Tags API.admin
-	// @Router /api/admin [post]
+	// @Router /hanlder/admin [post]
 	Create() httpx.HandlerFunc
 
 	// List 管理员列表
 	// @Tags API.admin
-	// @Router /api/admin [get]
+	// @Router /hanlder/admin [get]
 	List() httpx.HandlerFunc
 
 	// Delete 删除管理员
 	// @Tags API.admin
-	// @Router /api/admin/{id} [delete]
+	// @Router /hanlder/admin/{id} [delete]
 	Delete() httpx.HandlerFunc
 
 	// Offline 下线管理员
 	// @Tags API.admin
-	// @Router /api/admin/offline [patch]
+	// @Router /hanlder/admin/offline [patch]
 	Offline() httpx.HandlerFunc
 
 	// UpdateUsed 更新管理员为启用/禁用
 	// @Tags API.admin
-	// @Router /api/admin/used [patch]
+	// @Router /hanlder/admin/used [patch]
 	UpdateUsed() httpx.HandlerFunc
 
 	// ResetPassword 重置密码
 	// @Tags API.admin
-	// @Router /api/admin/reset_password/{id} [patch]
+	// @Router /hanlder/admin/reset_password/{id} [patch]
 	ResetPassword() httpx.HandlerFunc
 }
 

@@ -2,7 +2,7 @@ package admin
 
 import (
 	"github.com/pkg/errors"
-	"go-porter/internal/ecode"
+	"go-porter/internal/errCode"
 	"go-porter/internal/service/admin"
 	"go-porter/pkg/core/pkg/net/httpx"
 )
@@ -30,14 +30,14 @@ type createResponse struct {
 // @Param password formData string true "MD5后的密码"
 // @Success 200 {object} createResponse
 // @Failure 400 {object} ecode.Failure
-// @Router /api/admin [post]
+// @Router /hanlder/admin [post]
 // @Security LoginToken
 func (h *handler) Create() httpx.HandlerFunc {
 	return func(c httpx.Context) {
 		req := new(createRequest)
 		res := new(createResponse)
 		if err := c.ShouldBindForm(req); err != nil {
-			c.AbortWithError(errors.Wrapf(ecode.ErrParamBind, "Create error %+v", err))
+			c.AbortWithError(errors.Wrapf(errCode.ErrParamBind, "Create error %+v", err))
 			return
 		}
 

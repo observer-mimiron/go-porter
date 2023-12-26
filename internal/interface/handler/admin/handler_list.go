@@ -3,7 +3,7 @@ package admin
 import (
 	"github.com/pkg/errors"
 	"go-porter/configs"
-	"go-porter/internal/ecode"
+	"go-porter/internal/errCode"
 	"go-porter/internal/service/admin"
 	"go-porter/internal/util/password"
 	"go-porter/pkg/core/pkg/net/httpx"
@@ -56,14 +56,14 @@ type listResponse struct {
 // @Param mobile query string false "手机号"
 // @Success 200 {object} listResponse
 // @Failure 400 {object} ecode.Failure
-// @Router /api/admin [get]
+// @Router /hanlder/admin [get]
 // @Security LoginToken
 func (h *handler) List() httpx.HandlerFunc {
 	return func(c httpx.Context) {
 		req := new(listRequest)
 		res := new(listResponse)
 		if err := c.ShouldBindForm(req); err != nil {
-			c.AbortWithError(errors.Wrapf(ecode.ErrParamBind, "c.ShouldBindForm error: %s", err))
+			c.AbortWithError(errors.Wrapf(errCode.ErrParamBind, "c.ShouldBindForm error: %s", err))
 			return
 		}
 
@@ -87,7 +87,7 @@ func (h *handler) List() httpx.HandlerFunc {
 		adminService := admin.New(h.svcCtx)
 		resListData, resCountData, err := adminService.PageList(c, searchData)
 		if err != nil {
-			c.AbortWithError(errors.Wrapf(ecode.ErrAdminList, "adminService.PageList error: %s", err))
+			c.AbortWithError(errors.Wrapf(errCode.ErrServer, "adminService.PageList error: %s", err))
 			return
 		}
 
@@ -99,7 +99,7 @@ func (h *handler) List() httpx.HandlerFunc {
 		for k, v := range resListData {
 			hashId, err := h.hashids.HashidsEncode([]int{cast.ToInt(v.Id)})
 			if err != nil {
-				c.AbortWithError(errors.Wrap(ecode.ErrHashIdsDxerror, err.Error()))
+				c.AbortWithError(errors.Wrap(errCode.ErrServer, err.Error()))
 				return
 			}
 

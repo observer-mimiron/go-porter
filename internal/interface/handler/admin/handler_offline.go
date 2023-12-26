@@ -3,7 +3,7 @@ package admin
 import (
 	"github.com/pkg/errors"
 	"go-porter/configs"
-	"go-porter/internal/ecode"
+	"go-porter/internal/errCode"
 	"go-porter/internal/util/password"
 	"go-porter/pkg/core/pkg/cache/redis"
 	"go-porter/pkg/core/pkg/net/httpx"
@@ -26,20 +26,20 @@ type offlineResponse struct {
 // @Param id formData string true "Hashid"
 // @Success 200 {object} offlineResponse
 // @Failure 400 {object} ecode.Failure
-// @Router /api/admin/offline [patch]
+// @Router /hanlder/admin/offline [patch]
 // @Security LoginToken
 func (h *handler) Offline() httpx.HandlerFunc {
 	return func(c httpx.Context) {
 		req := new(offlineRequest)
 		res := new(offlineResponse)
 		if err := c.ShouldBindForm(req); err != nil {
-			c.AbortWithError(errors.Wrapf(ecode.ErrParamBind, "Offline error %+v", err))
+			c.AbortWithError(errors.Wrapf(errCode.ErrParamBind, "Offline error %+v", err))
 			return
 		}
 
 		ids, err := h.hashids.HashidsDecode(req.Id)
 		if err != nil {
-			c.AbortWithError(errors.Wrapf(ecode.ErrHashIdsDxerror, "Offline error %+v", err))
+			c.AbortWithError(errors.Wrapf(errCode.ErrServer, "Offline error %+v", err))
 			return
 		}
 
@@ -47,7 +47,7 @@ func (h *handler) Offline() httpx.HandlerFunc {
 
 		b := h.svcCtx.Redis.Del(configs.RedisKeyPrefixLoginUser+password.GenerateLoginToken(id), redis.WithTrace(c.Trace()))
 		if !b {
-			c.AbortWithError(errors.Wrapf(ecode.ErrAdminOffline, "Offline error %+v", err))
+			c.AbortWithError(errors.Wrapf(errCode.ErrAdminOffline, "Offline error %+v", err))
 			return
 		}
 

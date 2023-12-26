@@ -2,7 +2,7 @@ package admin
 
 import (
 	"github.com/pkg/errors"
-	"go-porter/internal/ecode"
+	"go-porter/internal/errCode"
 	"go-porter/internal/service/admin"
 	"go-porter/pkg/core/pkg/net/httpx"
 )
@@ -21,7 +21,7 @@ type detailResponse struct {
 // @Produce json
 // @Success 200 {object} detailResponse
 // @Failure 400 {object} ecode.Failure
-// @Router /api/admin/info [get]
+// @Router /hanlder/admin/info [get]
 // @Security LoginToken
 func (h *handler) Detail() httpx.HandlerFunc {
 	return func(ctx httpx.Context) {
@@ -33,8 +33,8 @@ func (h *handler) Detail() httpx.HandlerFunc {
 
 		adminService := admin.New(h.svcCtx)
 		info, err := adminService.Detail(ctx, searchOneData)
-		if err != nil {
-			ctx.AbortWithError(errors.Wrapf(ecode.ErrAdminDetail, "Detail error %+v", err))
+		if err == nil {
+			ctx.AbortWithError(errors.Wrapf(errCode.ErrAdminDetail, "Detail error %+v", err))
 			return
 		}
 

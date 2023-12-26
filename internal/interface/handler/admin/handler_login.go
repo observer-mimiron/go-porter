@@ -3,7 +3,7 @@ package admin
 import (
 	"github.com/pkg/errors"
 	"go-porter/configs"
-	"go-porter/internal/ecode"
+	"go-porter/internal/errCode"
 	"go-porter/internal/service/admin"
 	"go-porter/internal/util/password"
 	"go-porter/pkg/core/pkg/cache/redis"
@@ -30,14 +30,14 @@ type loginResponse struct {
 // @Param password formData string true "MD5后的密码"
 // @Success 200 {object} loginResponse
 // @Failure 400 {object} ecode.Failure
-// @Router /api/login [post]
+// @Router /hanlder/login [post]
 // @Security LoginToken
 func (h *handler) Login() httpx.HandlerFunc {
 	return func(c httpx.Context) {
 		req := new(loginRequest)
 		res := new(loginResponse)
 		if err := c.ShouldBindForm(req); err != nil {
-			c.AbortWithError(errors.Wrapf(ecode.ErrParamBind, "Create error %+v", err))
+			c.AbortWithError(errors.Wrapf(errCode.ErrParamBind, "Create error %+v", err))
 			return
 		}
 
@@ -54,7 +54,7 @@ func (h *handler) Login() httpx.HandlerFunc {
 		}
 
 		if info == nil {
-			c.AbortWithError(errors.Wrapf(ecode.ErrUserNotFound, "Login error %+v", searchOneData))
+			c.AbortWithError(errors.Wrapf(errCode.ErrUserNotFound, "Login error %+v", searchOneData))
 			return
 		}
 
@@ -69,7 +69,7 @@ func (h *handler) Login() httpx.HandlerFunc {
 		// 将用户信息记录到 Redis 中
 		err = h.svcCtx.Redis.Set(configs.RedisKeyPrefixLoginUser+token, string(sessionUserInfo.Marshal()), configs.LoginSessionTTL, redis.WithTrace(c.Trace()))
 		if err != nil {
-			c.AbortWithError(errors.Wrapf(ecode.ErrAdminLogin, "Login error %+v", err))
+			c.AbortWithError(errors.Wrapf(errCode.ErrAdminLogin, "Login error %+v", err))
 			return
 		}
 

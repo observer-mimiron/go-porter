@@ -3,7 +3,7 @@ package admin
 import (
 	"github.com/pkg/errors"
 	"go-porter/configs"
-	"go-porter/internal/ecode"
+	"go-porter/internal/errCode"
 	"go-porter/pkg/core/pkg/cache/redis"
 	"go-porter/pkg/core/pkg/net/httpx"
 )
@@ -20,7 +20,7 @@ type logoutResponse struct {
 // @Produce json
 // @Success 200 {object} logoutResponse
 // @Failure 400 {object} ecode.Failure
-// @Router /api/admin/logout [post]
+// @Router /hanlder/admin/logout [post]
 // @Security LoginToken
 func (h *handler) Logout() httpx.HandlerFunc {
 	return func(c httpx.Context) {
@@ -28,7 +28,7 @@ func (h *handler) Logout() httpx.HandlerFunc {
 		res.Username = c.SessionUserInfo().UserName
 
 		if !h.svcCtx.Redis.Del(configs.RedisKeyPrefixLoginUser+c.GetHeader(configs.HeaderLoginToken), redis.WithTrace(c.Trace())) {
-			c.AbortWithError(errors.Wrap(ecode.ErrAdminLogOut, "Logout error"))
+			c.AbortWithError(errors.Wrap(errCode.ErrAdminLogOut, "Logout error"))
 			return
 		}
 

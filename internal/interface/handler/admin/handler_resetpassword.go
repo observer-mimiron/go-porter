@@ -2,7 +2,7 @@ package admin
 
 import (
 	"github.com/pkg/errors"
-	"go-porter/internal/ecode"
+	"go-porter/internal/errCode"
 	"go-porter/internal/service/admin"
 	"go-porter/pkg/core/pkg/net/httpx"
 )
@@ -24,20 +24,20 @@ type resetPasswordResponse struct {
 // @Param id path string true "hashId"
 // @Success 200 {object} resetPasswordResponse
 // @Failure 400 {object} ecode.Failure
-// @Router /api/admin/reset_password/{id} [patch]
+// @Router /hanlder/admin/reset_password/{id} [patch]
 // @Security LoginToken
 func (h *handler) ResetPassword() httpx.HandlerFunc {
 	return func(c httpx.Context) {
 		req := new(resetPasswordRequest)
 		res := new(resetPasswordResponse)
 		if err := c.ShouldBindURI(req); err != nil {
-			c.AbortWithError(errors.Wrapf(ecode.ErrParamBind, "ResetPassword error %+v", err))
+			c.AbortWithError(errors.Wrapf(errCode.ErrParamBind, "ResetPassword error %+v", err))
 			return
 		}
 
 		ids, err := h.hashids.HashidsDecode(req.Id)
 		if err != nil {
-			c.AbortWithError(errors.Wrapf(ecode.ErrHashIdsDxerror, "ResetPassword  error %+v", err))
+			c.AbortWithError(errors.Wrapf(errCode.ErrServer, "ResetPassword  error %+v", err))
 			return
 		}
 
@@ -46,7 +46,7 @@ func (h *handler) ResetPassword() httpx.HandlerFunc {
 		adminService := admin.New(h.svcCtx)
 		err = adminService.ResetPassword(c, id)
 		if err != nil {
-			c.AbortWithError(errors.Wrapf(ecode.ErrAdminResetPassword, "ResetPassword  error %+v", err))
+			c.AbortWithError(errors.Wrapf(errCode.ErrAdminResetPassword, "ResetPassword  error %+v", err))
 			return
 		}
 

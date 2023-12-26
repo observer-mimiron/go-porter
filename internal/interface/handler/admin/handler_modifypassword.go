@@ -2,7 +2,7 @@ package admin
 
 import (
 	"github.com/pkg/errors"
-	"go-porter/internal/ecode"
+	"go-porter/internal/errCode"
 	"go-porter/internal/service/admin"
 	"go-porter/internal/util/password"
 	"go-porter/pkg/core/pkg/net/httpx"
@@ -27,14 +27,14 @@ type modifyPasswordResponse struct {
 // @Param new_password formData string true "新密码"
 // @Success 200 {object} modifyPasswordResponse
 // @Failure 400 {object} ecode.Failure
-// @Router /api/admin/modify_password [patch]
+// @Router /hanlder/admin/modify_password [patch]
 // @Security LoginToken
 func (h *handler) ModifyPassword() httpx.HandlerFunc {
 	return func(ctx httpx.Context) {
 		req := new(modifyPasswordRequest)
 		res := new(modifyPasswordResponse)
 		if err := ctx.ShouldBindForm(req); err != nil {
-			ctx.AbortWithError(errors.Wrapf(ecode.ErrParamBind, "ModifyPassword error %+v", err))
+			ctx.AbortWithError(errors.Wrapf(errCode.ErrParamBind, "ModifyPassword error %+v", err))
 			return
 		}
 
@@ -51,7 +51,7 @@ func (h *handler) ModifyPassword() httpx.HandlerFunc {
 		}
 
 		if err := adminService.ModifyPassword(ctx, ctx.SessionUserInfo().UserID, req.NewPassword); err != nil {
-			ctx.AbortWithError(errors.Wrapf(ecode.ErrAdminModifyPassword, "ModifyPassword error %+v", err))
+			ctx.AbortWithError(errors.Wrapf(errCode.ErrAdminModifyPassword, "ModifyPassword error %+v", err))
 			return
 		}
 
