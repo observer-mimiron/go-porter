@@ -2,179 +2,25 @@ package httpx
 
 import (
 	"fmt"
+	"github.com/gin-contrib/pprof"
+	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	cors "github.com/rs/cors/wrapper/gin"
 	"go-porter/configs"
 	"go-porter/internal/errCode"
 	"go-porter/pkg/core/pkg/conf/env"
 	"go-porter/pkg/core/pkg/proposal"
 	"go-porter/pkg/core/pkg/trace"
+	"go.uber.org/multierr"
+	"go.uber.org/zap"
+	"golang.org/x/time/rate"
 	"net/http"
 	"net/url"
 	"runtime/debug"
 	"strings"
 	"time"
-
-	"github.com/gin-contrib/pprof"
-	"github.com/gin-gonic/gin"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	cors "github.com/rs/cors/wrapper/gin"
-	"go.uber.org/multierr"
-	"go.uber.org/zap"
-	"golang.org/x/time/rate"
 )
-
-type Option func(*option)
-
-type option struct {
-	disablePProf      bool
-	disableSwagger    bool
-	disablePrometheus bool
-	enableCors        bool
-	enableRate        bool
-	alertNotify       proposal.NotifyHandler
-	recordHandler     proposal.RecordHandler
-}
-
-// WithDisablePProf 禁用 pprof
-func WithDisablePProf() Option {
-	return func(opt *option) {
-		opt.disablePProf = true
-	}
-}
-
-// WithDisableSwagger 禁用 swagger
-func WithDisableSwagger() Option {
-	return func(opt *option) {
-		opt.disableSwagger = true
-	}
-}
-
-// WithDisablePrometheus 禁用prometheus
-func WithDisablePrometheus() Option {
-	return func(opt *option) {
-		opt.disablePrometheus = true
-	}
-}
-
-// WithAlertNotify 设置告警通知
-func WithAlertNotify(notifyHandler proposal.NotifyHandler) Option {
-	return func(opt *option) {
-		opt.alertNotify = notifyHandler
-	}
-}
-
-// WithRecordMetrics 设置记录接口指标
-func WithRecordMetrics(recordHandler proposal.RecordHandler) Option {
-	return func(opt *option) {
-		opt.recordHandler = recordHandler
-	}
-}
-
-// WithEnableCors 设置支持跨域
-func WithEnableCors() Option {
-	return func(opt *option) {
-		opt.enableCors = true
-	}
-}
-
-// WithEnableRate 设置支持限流
-func WithEnableRate() Option {
-	return func(opt *option) {
-		opt.enableRate = true
-	}
-}
-
-// DisableTraceLog 禁止记录日志
-func DisableTraceLog(ctx Context) {
-	ctx.disableTrace()
-}
-
-// DisableRecordMetrics 禁止记录指标
-func DisableRecordMetrics(ctx Context) {
-	ctx.disableRecordMetrics()
-}
-
-// AliasForRecordMetrics 对请求路径起个别名，用于记录指标。
-// 如：Get /user/:username 这样的路径，因为 username 会有非常多的情况，这样记录指标非常不友好。
-func AliasForRecordMetrics(path string) HandlerFunc {
-	return func(ctx Context) {
-		ctx.setAlias(path)
-	}
-}
-
-// WrapAuthHandler 用来处理 Auth 的入口
-func WrapAuthHandler(handler func(Context) (sessionUserInfo proposal.SessionUserInfo, err *errCode.ErrCode)) HandlerFunc {
-	return func(ctx Context) {
-		sessionUserInfo, err := handler(ctx)
-		if err != nil {
-			ctx.AbortWithError(err)
-			return
-		}
-
-		ctx.setSessionUserInfo(sessionUserInfo)
-	}
-}
-
-// RouterGroup 包装gin的RouterGroup
-type RouterGroup interface {
-	Group(string, ...HandlerFunc) RouterGroup
-	IRoutes
-}
-
-var _ IRoutes = (*router)(nil)
-
-// IRoutes 包装gin的IRoutes
-type IRoutes interface {
-	Any(string, ...HandlerFunc)
-	GET(string, ...HandlerFunc)
-	POST(string, ...HandlerFunc)
-	DELETE(string, ...HandlerFunc)
-	PATCH(string, ...HandlerFunc)
-	PUT(string, ...HandlerFunc)
-	OPTIONS(string, ...HandlerFunc)
-	HEAD(string, ...HandlerFunc)
-}
-
-type router struct {
-	group *gin.RouterGroup
-}
-
-func (r *router) Group(relativePath string, handlers ...HandlerFunc) RouterGroup {
-	group := r.group.Group(relativePath, wrapHandlers(handlers...)...)
-	return &router{group: group}
-}
-
-func (r *router) Any(relativePath string, handlers ...HandlerFunc) {
-	r.group.Any(relativePath, wrapHandlers(handlers...)...)
-}
-
-func (r *router) GET(relativePath string, handlers ...HandlerFunc) {
-	r.group.GET(relativePath, wrapHandlers(handlers...)...)
-}
-
-func (r *router) POST(relativePath string, handlers ...HandlerFunc) {
-	r.group.POST(relativePath, wrapHandlers(handlers...)...)
-}
-
-func (r *router) DELETE(relativePath string, handlers ...HandlerFunc) {
-	r.group.DELETE(relativePath, wrapHandlers(handlers...)...)
-}
-
-func (r *router) PATCH(relativePath string, handlers ...HandlerFunc) {
-	r.group.PATCH(relativePath, wrapHandlers(handlers...)...)
-}
-
-func (r *router) PUT(relativePath string, handlers ...HandlerFunc) {
-	r.group.PUT(relativePath, wrapHandlers(handlers...)...)
-}
-
-func (r *router) OPTIONS(relativePath string, handlers ...HandlerFunc) {
-	r.group.OPTIONS(relativePath, wrapHandlers(handlers...)...)
-}
-
-func (r *router) HEAD(relativePath string, handlers ...HandlerFunc) {
-	r.group.HEAD(relativePath, wrapHandlers(handlers...)...)
-}
 
 func wrapHandlers(handlers ...HandlerFunc) []gin.HandlerFunc {
 	funcs := make([]gin.HandlerFunc, len(handlers))
@@ -213,71 +59,9 @@ func (m *mux) Group(relativePath string, handlers ...HandlerFunc) RouterGroup {
 	}
 }
 
-func New(logger *zap.Logger, options ...Option) (Mux, error) {
-	if logger == nil {
-		return nil, errors.New("logger is nil")
-	}
-
-	gin.SetMode(gin.ReleaseMode)
-	mux := &mux{
-		engine: gin.New(),
-	}
-
-	// withoutTracePaths 这些请求，默认不记录日志
-	withoutTracePaths := map[string]bool{
-		"/metrics": true,
-
-		"/debug/pprof/":             true,
-		"/debug/pprof/cmdline":      true,
-		"/debug/pprof/profile":      true,
-		"/debug/pprof/symbol":       true,
-		"/debug/pprof/trace":        true,
-		"/debug/pprof/allocs":       true,
-		"/debug/pprof/block":        true,
-		"/debug/pprof/goroutine":    true,
-		"/debug/pprof/heap":         true,
-		"/debug/pprof/mutex":        true,
-		"/debug/pprof/threadcreate": true,
-
-		"/favicon.ico": true,
-
-		"/system/health": true,
-	}
-
-	opt := new(option)
-	for _, f := range options {
-		f(opt)
-	}
-
-	if !opt.disablePProf {
-		if !env.Active().IsPro() {
-			pprof.Register(mux.engine) // register pprof to gin
-		}
-	}
-
-	if !opt.disablePrometheus {
-		mux.engine.GET("/metrics", gin.WrapH(promhttp.Handler())) // register prometheus
-	}
-
-	if opt.enableCors {
-		mux.engine.Use(cors.New(cors.Options{
-			AllowedOrigins: []string{"*"},
-			AllowedMethods: []string{
-				http.MethodHead,
-				http.MethodGet,
-				http.MethodPost,
-				http.MethodPut,
-				http.MethodPatch,
-				http.MethodDelete,
-			},
-			AllowedHeaders:     []string{"*"},
-			AllowCredentials:   true,
-			OptionsPassthrough: true,
-		}))
-	}
-
-	// recover两次，防止处理时发生panic，尤其是在OnPanicNotify中。
-	mux.engine.Use(func(ctx *gin.Context) {
+//panicHandler panic处理
+func (m *mux) panicHandler(logger *zap.Logger) gin.IRoutes {
+	return m.engine.Use(func(ctx *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
 				logger.Error("got panic", zap.String("panic", fmt.Sprintf("%+v", err)), zap.String("stack", string(debug.Stack())))
@@ -286,8 +70,11 @@ func New(logger *zap.Logger, options ...Option) (Mux, error) {
 
 		ctx.Next()
 	})
+}
 
-	mux.engine.Use(func(ctx *gin.Context) {
+//errorHandler 错误处理
+func (m *mux) errorHandler(logger *zap.Logger, opt *option) gin.IRoutes {
+	return m.engine.Use(func(ctx *gin.Context) {
 		if ctx.Writer.Status() == http.StatusNotFound {
 			return
 		}
@@ -301,7 +88,7 @@ func New(logger *zap.Logger, options ...Option) (Mux, error) {
 		context.setLogger(logger)
 		context.ableRecordMetrics()
 
-		if !withoutTracePaths[ctx.Request.URL.Path] {
+		if !opt.outTracePaths[ctx.Request.URL.Path] {
 			if traceId := context.GetHeader(trace.Header); traceId != "" {
 				context.setTrace(trace.New(traceId))
 			} else {
@@ -488,6 +275,53 @@ func New(logger *zap.Logger, options ...Option) (Mux, error) {
 
 		ctx.Next()
 	})
+}
+
+func New(logger *zap.Logger, options ...Option) (Mux, error) {
+	if logger == nil {
+		return nil, errors.New("logger is nil")
+	}
+
+	gin.SetMode(gin.ReleaseMode)
+	mux := &mux{
+		engine: gin.New(),
+	}
+
+	opt := new(option)
+	for _, f := range options {
+		f(opt)
+	}
+
+	if !opt.disablePProf {
+		if !env.Active().IsPro() {
+			pprof.Register(mux.engine) // register pprof to gin
+		}
+	}
+
+	if !opt.disablePrometheus {
+		mux.engine.GET("/metrics", gin.WrapH(promhttp.Handler())) // register prometheus
+	}
+
+	if opt.enableCors {
+		mux.engine.Use(cors.New(cors.Options{
+			AllowedOrigins: []string{"*"},
+			AllowedMethods: []string{
+				http.MethodHead,
+				http.MethodGet,
+				http.MethodPost,
+				http.MethodPut,
+				http.MethodPatch,
+				http.MethodDelete,
+			},
+			AllowedHeaders:     []string{"*"},
+			AllowCredentials:   true,
+			OptionsPassthrough: true,
+		}))
+	}
+
+	mux.panicHandler(logger)
+
+	mux.errorHandler(logger, opt)
 
 	//限流器
 	if opt.enableRate {
@@ -509,7 +343,6 @@ func New(logger *zap.Logger, options ...Option) (Mux, error) {
 			ctx.Next()
 		})
 	}
-
 	mux.engine.NoMethod(wrapHandlers(DisableTraceLog)...)
 	mux.engine.NoRoute(wrapHandlers(DisableTraceLog)...)
 
