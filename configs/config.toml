@@ -4,7 +4,7 @@ Port = 8080
 
 [hashids]
 length = 12
-secret = "6ab6122836cfef95f8db"
+secret = "change-me-before-use"
 
 [log]
 Model = "console"
@@ -28,13 +28,13 @@ maxopenconn = 10
 [mysql.write]
 addr = "127.0.0.1:3306"
 name = "porter"
-pass = "root"
+pass = ""
 user = "root"
 
 [mysql.read]
 addr = "127.0.0.1:3306"
 name = "porter"
-pass = "root"
+pass = ""
 user = "root"
 [redis]
 addr = "127.0.0.1:6379"

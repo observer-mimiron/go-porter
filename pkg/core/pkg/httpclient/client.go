@@ -8,8 +8,8 @@ import (
 	httpURL "net/url"
 	"time"
 
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/trace"
 	"github.com/pkg/errors"
-	"go-porter/pkg/core/pkg/trace"
 )
 
 const (

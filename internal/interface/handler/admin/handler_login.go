@@ -1,14 +1,14 @@
 package admin
 
 import (
+	"github.com/observer-mimiron/go-porter/configs"
+	"github.com/observer-mimiron/go-porter/internal/errCode"
+	"github.com/observer-mimiron/go-porter/internal/service/admin"
+	"github.com/observer-mimiron/go-porter/internal/util/password"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/cache/redis"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/net/httpx"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/proposal"
 	"github.com/pkg/errors"
-	"go-porter/configs"
-	"go-porter/internal/errCode"
-	"go-porter/internal/service/admin"
-	"go-porter/internal/util/password"
-	"go-porter/pkg/core/pkg/cache/redis"
-	"go-porter/pkg/core/pkg/net/httpx"
-	"go-porter/pkg/core/pkg/proposal"
 )
 
 type loginRequest struct {

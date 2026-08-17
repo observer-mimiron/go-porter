@@ -3,14 +3,14 @@ package httpx
 import (
 	"bytes"
 	stdctx "context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
 	"sync"
 
-	"go-porter/pkg/core/pkg/proposal"
-	"go-porter/pkg/core/pkg/trace"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/proposal"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/trace"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -139,8 +139,8 @@ func (c *context) init() {
 		panic(err)
 	}
 
-	c.ctx.Set(_BodyName, body)                                   // cache body是为了trace使用
-	c.ctx.Request.Body = ioutil.NopCloser(bytes.NewBuffer(body)) // re-construct req body
+	c.ctx.Set(_BodyName, body)                               // cache body是为了trace使用
+	c.ctx.Request.Body = io.NopCloser(bytes.NewBuffer(body)) // re-construct req body
 }
 
 // ShouldBindQuery 反序列化querystring

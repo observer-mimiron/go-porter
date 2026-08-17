@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"go-porter/pkg/core/pkg/trace"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/trace"
 )
 
 type Option func(*option)

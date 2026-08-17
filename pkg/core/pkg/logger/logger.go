@@ -2,7 +2,7 @@ package logger
 
 import (
 	"fmt"
-	"go-porter/pkg/core/pkg/conf/env"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/conf/env"
 	"io"
 	"os"
 	"path/filepath"
@@ -60,7 +60,7 @@ func setupWithLevel(level string) zapcore.Level {
 func setupWithFiles(logConf Conf) *lumberjack.Logger {
 	fileName := logConf.Filename
 	if fileName == "" {
-		fileName = fmt.Sprintf("%s/%s.log", env.Active(), "poter")
+		fileName = fmt.Sprintf("%s/%s.log", env.Active(), "porter")
 	}
 	dir := filepath.Dir(fileName)
 	if err := os.MkdirAll(dir, 0766); err != nil {
@@ -84,7 +84,7 @@ func NewJSONLogger(logConf Conf) (*zap.Logger, error) {
 
 	timeLayout := DefaultTimeLayout
 	if logConf.TimeFormat != "" {
-		timeLayout = opt.timeLayout
+		timeLayout = logConf.TimeFormat
 	}
 
 	// similar to zap.NewProduction EncoderConfig()
@@ -158,7 +158,7 @@ func NewJSONLogger(logConf Conf) (*zap.Logger, error) {
 	)
 
 	// set fields 添加一些字段到日志中
-	opt.fields["domain"] = fmt.Sprintf("%s[%s]", "poter", env.Active().Value())
+	opt.fields["domain"] = fmt.Sprintf("%s[%s]", "porter", env.Active().Value())
 	for key, value := range opt.fields {
 		logger = logger.WithOptions(zap.Fields(zapcore.Field{Key: key, Type: zapcore.StringType, String: value}))
 	}

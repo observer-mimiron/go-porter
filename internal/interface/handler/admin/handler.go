@@ -1,10 +1,10 @@
 package admin
 
 import (
-	"go-porter/internal/svc"
-	"go-porter/pkg/core/pkg/conf"
-	"go-porter/pkg/core/pkg/net/httpx"
-	"go-porter/pkg/cryptor/hash"
+	"github.com/observer-mimiron/go-porter/internal/svc"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/conf"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/net/httpx"
+	"github.com/observer-mimiron/go-porter/pkg/cryptor/hash"
 )
 
 var _ Handler = (*handler)(nil)

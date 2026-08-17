@@ -10,7 +10,7 @@ package errCode
 
 const Alert = 1
 
-//异常
+// 异常
 var (
 	// server errors
 	ErrServer         = NewErrCode(500001, "服务器异常").Alert()

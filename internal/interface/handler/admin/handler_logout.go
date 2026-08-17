@@ -1,11 +1,11 @@
 package admin
 
 import (
+	"github.com/observer-mimiron/go-porter/configs"
+	"github.com/observer-mimiron/go-porter/internal/errCode"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/cache/redis"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/net/httpx"
 	"github.com/pkg/errors"
-	"go-porter/configs"
-	"go-porter/internal/errCode"
-	"go-porter/pkg/core/pkg/cache/redis"
-	"go-porter/pkg/core/pkg/net/httpx"
 )
 
 type logoutResponse struct {

@@ -1,11 +1,11 @@
 package admin
 
 import (
-	"go-porter/configs"
-	"go-porter/internal/model"
-	"go-porter/internal/util/password"
-	"go-porter/pkg/core/pkg/cache/redis"
-	"go-porter/pkg/core/pkg/net/httpx"
+	"github.com/observer-mimiron/go-porter/configs"
+	"github.com/observer-mimiron/go-porter/internal/model"
+	"github.com/observer-mimiron/go-porter/internal/util/password"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/cache/redis"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/net/httpx"
 )
 
 func (s *service) UpdateUsed(ctx httpx.Context, id int32, used int32) (err error) {

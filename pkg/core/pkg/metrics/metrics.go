@@ -1,7 +1,7 @@
 package metrics
 
 import (
-	"go-porter/pkg/core/pkg/proposal"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/proposal"
 
 	"go.uber.org/zap"
 )

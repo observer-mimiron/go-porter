@@ -55,13 +55,14 @@ type dbRepo struct {
 func New(cfg Conf) (Repo, error) {
 	dbr, err := dbConnect(cfg.Base, cfg.Read.User, cfg.Read.Pass, cfg.Read.Addr, cfg.Read.Name)
 	if err != nil {
-		panic(err)
 		return nil, err
 	}
 
 	dbw, err := dbConnect(cfg.Base, cfg.Write.User, cfg.Write.Pass, cfg.Write.Addr, cfg.Write.Name)
 	if err != nil {
-		panic(err)
+		if sqlDB, closeErr := dbr.DB(); closeErr == nil {
+			_ = sqlDB.Close()
+		}
 		return nil, err
 	}
 	return &dbRepo{

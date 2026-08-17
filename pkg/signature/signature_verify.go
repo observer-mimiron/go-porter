@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/observer-mimiron/go-porter/pkg/timeutil"
 	"github.com/pkg/errors"
-	"go-porter/pkg/timeutil"
 )
 
 func (s *signature) Verify(authorization, date string, path string, method string, params url.Values) (ok bool, err error) {

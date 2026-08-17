@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"go-porter/pkg/core/pkg/trace"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/trace"
 
 	"go.uber.org/zap"
 )

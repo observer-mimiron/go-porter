@@ -1,10 +1,10 @@
 package admin
 
 import (
+	"github.com/observer-mimiron/go-porter/internal/errCode"
+	"github.com/observer-mimiron/go-porter/internal/service/admin"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/net/httpx"
 	"github.com/pkg/errors"
-	"go-porter/internal/errCode"
-	"go-porter/internal/service/admin"
-	"go-porter/pkg/core/pkg/net/httpx"
 )
 
 type detailResponse struct {

@@ -3,9 +3,9 @@ package mysql
 import (
 	"time"
 
-	"go-porter/pkg/core/pkg/net/httpx"
-	"go-porter/pkg/core/pkg/trace"
-	"go-porter/pkg/timeutil"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/net/httpx"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/trace"
+	"github.com/observer-mimiron/go-porter/pkg/timeutil"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/utils"

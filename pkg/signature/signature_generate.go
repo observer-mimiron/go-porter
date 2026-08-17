@@ -9,8 +9,8 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/observer-mimiron/go-porter/pkg/timeutil"
 	"github.com/pkg/errors"
-	"go-porter/pkg/timeutil"
 )
 
 // Generate

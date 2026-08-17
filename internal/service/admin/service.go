@@ -1,9 +1,9 @@
 package admin
 
 import (
-	"go-porter/internal/model"
-	"go-porter/internal/svc"
-	"go-porter/pkg/core/pkg/net/httpx"
+	"github.com/observer-mimiron/go-porter/internal/model"
+	"github.com/observer-mimiron/go-porter/internal/svc"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/net/httpx"
 )
 
 var _ Service = (*service)(nil)

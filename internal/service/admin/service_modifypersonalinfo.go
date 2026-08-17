@@ -1,8 +1,8 @@
 package admin
 
 import (
-	"go-porter/internal/model"
-	"go-porter/pkg/core/pkg/net/httpx"
+	"github.com/observer-mimiron/go-porter/internal/model"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/net/httpx"
 )
 
 type ModifyData struct {

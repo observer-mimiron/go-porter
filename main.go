@@ -3,29 +3,34 @@ package main
 import (
 	"context"
 	"flag"
-	"go-porter/configs"
-	"go-porter/internal/svc"
-	"go-porter/pkg/core/pkg/conf"
-	"go-porter/pkg/core/pkg/net/httpx"
+	"github.com/observer-mimiron/go-porter/configs"
+	"github.com/observer-mimiron/go-porter/internal/svc"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/conf"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/net/httpx"
 	"log"
 	"net/http"
 	"time"
 
-	"go-porter/internal/interface/router"
-	"go-porter/pkg/core/pkg/shutdown"
+	"github.com/observer-mimiron/go-porter/internal/interface/router"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/shutdown"
 	"go.uber.org/zap"
 )
 
-var configFile = flag.String("f", "/configs/config.toml", "the config file")
+var configFile = flag.String("f", "./configs/config.toml", "the config file")
 
 func main() {
 	flag.Parse()
 
-	conf.Init(configFile)
+	if err := conf.Init(*configFile); err != nil {
+		log.Fatal("init config err", zap.Error(err))
+	}
 	c := conf.Get()
 
 	// 初始化服务组件
-	svcCtx := svc.NewServiceContext(c)
+	svcCtx, err := svc.NewServiceContext(c)
+	if err != nil {
+		log.Fatal("init service context err", zap.Error(err))
+	}
 
 	//开启相关功能组
 	mux, err := httpx.New(svcCtx.Logger,

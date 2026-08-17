@@ -1,8 +1,8 @@
 package httpx
 
 import (
-	"go-porter/internal/errCode"
-	"go-porter/pkg/core/pkg/proposal"
+	"github.com/observer-mimiron/go-porter/internal/errCode"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/proposal"
 )
 
 type Option func(*option)

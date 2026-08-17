@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
+	"github.com/observer-mimiron/go-porter/configs"
+	"github.com/observer-mimiron/go-porter/internal/errCode"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/conf/env"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/proposal"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/trace"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	cors "github.com/rs/cors/wrapper/gin"
-	"go-porter/configs"
-	"go-porter/internal/errCode"
-	"go-porter/pkg/core/pkg/conf/env"
-	"go-porter/pkg/core/pkg/proposal"
-	"go-porter/pkg/core/pkg/trace"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
 	"golang.org/x/time/rate"
@@ -59,7 +59,7 @@ func (m *mux) Group(relativePath string, handlers ...HandlerFunc) RouterGroup {
 	}
 }
 
-//panicHandler panic处理
+// panicHandler panic处理
 func (m *mux) panicHandler(logger *zap.Logger) gin.IRoutes {
 	return m.engine.Use(func(ctx *gin.Context) {
 		defer func() {
@@ -72,7 +72,7 @@ func (m *mux) panicHandler(logger *zap.Logger) gin.IRoutes {
 	})
 }
 
-//errorHandler 错误处理
+// errorHandler 错误处理
 func (m *mux) errorHandler(logger *zap.Logger, opt *option) gin.IRoutes {
 	return m.engine.Use(func(ctx *gin.Context) {
 		if ctx.Writer.Status() == http.StatusNotFound {

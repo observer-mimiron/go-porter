@@ -1,13 +1,13 @@
 package admin
 
 import (
+	"github.com/observer-mimiron/go-porter/configs"
+	"github.com/observer-mimiron/go-porter/internal/errCode"
+	"github.com/observer-mimiron/go-porter/internal/service/admin"
+	"github.com/observer-mimiron/go-porter/internal/util/password"
+	"github.com/observer-mimiron/go-porter/pkg/core/pkg/net/httpx"
+	"github.com/observer-mimiron/go-porter/pkg/timeutil"
 	"github.com/pkg/errors"
-	"go-porter/configs"
-	"go-porter/internal/errCode"
-	"go-porter/internal/service/admin"
-	"go-porter/internal/util/password"
-	"go-porter/pkg/core/pkg/net/httpx"
-	"go-porter/pkg/timeutil"
 
 	"github.com/spf13/cast"
 )
